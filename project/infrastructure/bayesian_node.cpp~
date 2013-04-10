@@ -1,0 +1,29 @@
+#ifndef BSNWN_M
+#define BSNWN_M
+
+
+
+#include "bayesian_node.h"
+
+BN_Node::BN_Node(int cardinality)
+{
+	this->m_cardinality = cardinality;
+	this->m_Nparents = 0;
+	this->m_Ncpt = 2;
+}
+
+void BN_Node::UpdateCPT(int position, double value)
+{
+	this->m_cpt[position] = value;
+	return;
+}
+
+void BN_Node::InsertParent(BN_Node* parent)
+{
+	this->m_Nparents++;
+	this->m_Ncpt *= 2;
+	this->m_parents[this->m_Nparents] = parent;	
+}
+
+
+#endif

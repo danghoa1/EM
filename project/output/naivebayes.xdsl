@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<smile version="1.0" id="Unnamed" numsamples="1000" discsamples="10000">
+	<nodes>
+		<cpt id="cancer">
+			<state id="negative" />
+			<state id="State__unobserved" />
+			<probabilities>0.8 0.2</probabilities>
+		</cpt>
+		<cpt id="testResult">
+			<state id="negative" />
+			<state id="positive" />
+			<parents>cancer</parents>
+			<probabilities>0.6000000000000001 0.4 0.5 0.5</probabilities>
+		</cpt>
+	</nodes>
+	<extensions>
+		<genie version="1.0" app="SMILE Nov 15 2012" name="Unnamed" faultnameformat="nodestate">
+			<node id="cancer">
+				<name>cancer</name>
+				<interior color="e5f6f7" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>-38 -18 38 18</position>
+			</node>
+			<node id="testResult">
+				<name>testResult</name>
+				<interior color="e5f6f7" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>-38 -18 38 18</position>
+			</node>
+		</genie>
+	</extensions>
+</smile>

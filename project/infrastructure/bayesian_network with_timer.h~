@@ -1,0 +1,19 @@
+#ifndef BSNWWT_H
+#define BSNWWT_H
+
+#include <iostream>
+#include "bayesian_network.h"
+
+
+using namespace std;
+
+class BayesNetworkWithTimer : BayesNetwork
+{
+public:
+	void ReadWithTimer(const char* networkFilePath);		//Create network from file
+	void LearnWithTimer(const char* datasetFilePath);		//Learn parameters from file
+	void PrintWithTimer();
+};
+
+
+#endif

@@ -1,0 +1,28 @@
+#ifndef BSNWN_M
+#define BSNWN_M
+
+const MAX_NUMBER_OF_PARENTS = 50;
+
+#include "bayesian_node.h"
+
+BS_Node::BS_Node(int cardinality)
+{
+	m_cardinality = cardinality;
+	m_Nparents = 0;
+	m_parents = new BS_Node*[MAX_NUMBER_OF_PARENTS];
+}
+
+BS_Node::UpdateCPT(int position, double value)
+{
+	m_cpt[position] = value;
+}
+
+BS_Node::InsertParent(BS_Node* parent)
+{
+	m_Nparents++;
+	m_parents[m_Nparents] = parent;	
+}
+
+
+
+#endif

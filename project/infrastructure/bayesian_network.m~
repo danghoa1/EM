@@ -1,0 +1,69 @@
+#ifndef BSNW_M
+#define BSNW_M
+
+#include "bayesian_network.h"
+#include <fstream>
+
+BayesNetwork::BayseNetwork(string filePath)
+{
+	ifstream netFile;
+	netFile.open(filePath);
+	
+// Read network type
+	string networkType;
+	netFile>>networkType;
+
+// Read number of nodes
+	netFile>>m_Nnodes;
+
+// Read the number of states each node
+	for(int i=0; i < m_Nnodes; i++)
+	{
+		int cardinality;
+		netFile>>cardinality;
+		
+		// Create new node
+		BS_Node* newNode = new BS_Node(cardinality);
+		m_nodes[i] = newNode;
+	}
+
+// Read the number of cliques
+	int Ncliques;
+	netFile>>Ncliques;
+
+// Read each clique
+	for(int i=0; i < Ncliques; i++)
+	{
+		int numVariables;
+		netFile>>numVariables;
+		int previous = -1;
+		for (int j=0; j < numVariables; j++)
+		{
+			netFile >> int current;
+			if (previous!=-1)
+			{
+				m_nodes[current]->InsertParent(m_nodes[previous]);
+			}
+			previous = current;
+		}
+		
+	}
+}
+
+void BayesNetwork::Print()
+{
+	for(int i=0; i< m_Nnodes; i++)
+	{
+		cout<<"Node "<<i<<"'s CPT:";
+		int nCPT = m_nodes[i]->GetCPTLength();
+		int cardinality = m_nodes[i]->GetCardinality;
+		for (int j=0; j < nCPT; j++)
+		{
+			cout<< m_nodes[i]->GetValueFromCPT(j);
+			if (j % cardinality == 0) cout<<endl;
+			else cout<<"  ";
+		}
+	}
+}
+
+#endif
