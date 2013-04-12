@@ -1,0 +1,6 @@
+# list of source files
+src = ['bayesian_network.cpp']
+main = ['main.cpp']
+
+Import('env')
+env.Program('bn',main+src)

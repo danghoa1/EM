@@ -1,0 +1,27 @@
+
+# mode debug, profile, or default
+mode = ARGUMENTS.get('mode',None)
+
+# libraries
+# lib = ['sdd','m']
+lib = []
+
+# compile
+env = Environment(CC='g++',CCFLAGS='-Wall -finline-functions ',
+                  CPPPATH='#/include',
+                  LIBS=lib,LIBPATH='#/lib')
+env.Append(CCFLAGS='-O2')
+
+# if mode == 'debug':
+#     build_dir = 'debug'
+#     env.Append(CCFLAGS='-g')
+# elif mode == 'profile':
+#     build_dir = 'debug'
+#     env.Append(CCFLAGS='-pg')
+# else:
+#     build_dir = 'build'
+#     env.Append(CCFLAGS='-O2')
+
+# SConscript('src/SConscript',variant_dir=build_dir,exports='env')
+
+SConscript('src/SConscript',variant_dir='#/bin',exports='env')
