@@ -1,0 +1,7 @@
+= build interface needed by EM, + EM
+
+= command line interface (maybe getopt?)
+
+= incorporate boost (minimally)
+
+= timings
