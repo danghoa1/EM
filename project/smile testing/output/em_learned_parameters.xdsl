@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<smile version="1.0" id="Sub0" numsamples="1000" discsamples="10000">
+	<nodes>
+		<cpt id="A">
+			<state id="true" />
+			<state id="false" />
+			<probabilities>0.6818181818181819 0.3181818181818182</probabilities>
+			<property id="excludepolicy">include whole CPT</property>
+			<property id="ismapvariable">false</property>
+			<property id="ID">variable2</property>
+			<property id="DSLxSUBMODEL">Root Submodel</property>
+			<property id="diagnosistype">AUXILIARY</property>
+		</cpt>
+		<cpt id="B">
+			<state id="true" />
+			<state id="false" />
+			<parents>A</parents>
+			<probabilities>0.4375 0.5625 0.375 0.625</probabilities>
+			<property id="excludepolicy">include whole CPT</property>
+			<property id="ismapvariable">false</property>
+			<property id="ID">variable4</property>
+			<property id="DSLxSUBMODEL">Root Submodel</property>
+			<property id="diagnosistype">AUXILIARY</property>
+		</cpt>
+		<cpt id="C">
+			<state id="true" />
+			<state id="false" />
+			<parents>A B</parents>
+			<probabilities>0.375 0.625 0.3 0.7000000000000001 0.75 0.25 0.5 0.5</probabilities>
+			<property id="excludepolicy">include whole CPT</property>
+			<property id="ismapvariable">false</property>
+			<property id="ID">variable3</property>
+			<property id="DSLxSUBMODEL">Root Submodel</property>
+			<property id="diagnosistype">AUXILIARY</property>
+		</cpt>
+	</nodes>
+	<extensions>
+		<genie version="1.0" app="SMILE Nov 15 2012" name="Sub0" faultnameformat="nodestate">
+			<node id="B">
+				<name>B</name>
+				<interior color="e5f6f7" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>273 124 403 179</position>
+			</node>
+			<node id="C">
+				<name>C</name>
+				<interior color="e5f6f7" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>85 193 215 248</position>
+			</node>
+			<node id="A">
+				<name>A</name>
+				<interior color="e5f6f7" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>113 22 243 77</position>
+			</node>
+		</genie>
+	</extensions>
+</smile>

@@ -1,0 +1,3 @@
+- I included 3 datasets for the same network.  To pick 1 dataset, rename it to dataset.dat
+- To compile: type "g++ main.cpp bayesian_network.cpp  -o ./main" (without quote)
+- To run: type "./main" (without quote)
