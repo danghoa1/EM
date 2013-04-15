@@ -1,6 +1,6 @@
 #include <iostream>
-#include "libs/smile/smile.h"
-#include "libs/smile/smilearn.h"
+#include "smile/smile.h"
+#include "smile/smilearn.h"
 
 using namespace std;
 

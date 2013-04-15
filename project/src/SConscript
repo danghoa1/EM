@@ -1,5 +1,5 @@
 # list of source files
-src = ['bayesian_network.cpp']
+src = ['bayesian_network.cpp','stopwatch.cpp']
 main = ['main.cpp']
 
 Import('env')

@@ -4,12 +4,12 @@ mode = ARGUMENTS.get('mode',None)
 
 # libraries
 # lib = ['sdd','m']
-lib = []
+lib = ['boost']
 
 # compile
 env = Environment(CC='g++',CCFLAGS='-Wall -finline-functions ',
                   CPPPATH='#/include',
-                  LIBS=lib,LIBPATH='#/lib')
+                  LIBS=lib,LIBPATH='#/libs')
 env.Append(CCFLAGS='-O2')
 
 # if mode == 'debug':
