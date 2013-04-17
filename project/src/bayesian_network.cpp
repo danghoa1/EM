@@ -2,6 +2,7 @@
 #define BSNW_M
 
 #include "bayesian_network.h"
+#include "random_generator.h"
 #include <iostream>
 #include <cstdlib>
 #include <fstream>
@@ -189,17 +190,6 @@ void BayesNetwork::Learn(const char* datasetFilePath)
 	}
 }
 
-void seedRandomGenerator(int seed)
-{
-	srand(seed);
-}
-
-double generateRandomNumber()
-{
-	
-	return (double(rand()) / RAND_MAX);
-}
-
 void BayesNetwork::Simulate(const char* simulateDatasetFilePath, int Ncases)
 {
 	//Initialize & Set up unnormalized CPT Table 
@@ -219,7 +209,7 @@ void BayesNetwork::Simulate(const char* simulateDatasetFilePath, int Ncases)
 	
 	//Generate dataset cases, assuming topological order
 	
-	seedRandomGenerator(time(NULL));
+	RandomGenerator randomGen(time(NULL));
 	
 	for (int c=1; c <= Ncases; c++)
 	{
@@ -234,7 +224,7 @@ void BayesNetwork::Simulate(const char* simulateDatasetFilePath, int Ncases)
 			do
 			{
 				double accumulate = 0;
-				double rand = generateRandomNumber();
+				double rand = randomGen.Randomize();
 			
 			
 				for (int j=0; j<this->nodes[i].cardinality; j++)
@@ -259,7 +249,8 @@ void BayesNetwork::Simulate(const char* simulateDatasetFilePath, int Ncases)
 			else
 				dsFile<<endl;
 		}
-	}	
+	}
+	dsFile.close();	
 }
 
 void BayesNetwork::Print()

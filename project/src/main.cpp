@@ -17,13 +17,17 @@ int main()
 	net.Read("network/network1.uai");
 	sw.End();
 	sw.Print("Read network:");
+
 	// Simulate
 	sw.Start();
 	net.Simulate("output/simulate1.dat",2000000);
 	sw.End();
 	sw.Print("Simulate dataset:");	
 
-
-	//net.Learn("output/simulate1.dat");
-	//net.Print();
+	// Maximum Likelihood
+	sw.Start();
+	net.Learn("output/simulate1.dat");
+	sw.End();
+	sw.Print("Maximum Likelihood:");
+	net.Print();
 }

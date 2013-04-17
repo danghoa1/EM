@@ -1,13 +1,12 @@
-
 # mode debug, profile, or default
 mode = ARGUMENTS.get('mode',None)
 
 # libraries
 # lib = ['sdd','m']
-lib = ['boost']
+lib = []
 
 # compile
-env = Environment(CC='g++',CCFLAGS='-Wall -finline-functions ',
+env = Environment(CC='g++',CCFLAGS='',
                   CPPPATH='#/include',
                   LIBS=lib,LIBPATH='#/libs')
 env.Append(CCFLAGS='-O2')
