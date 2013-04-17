@@ -1,6 +1,8 @@
 # list of source files
 src = ['bayesian_network.cpp','stopwatch.cpp','random_generator.cpp']
-main = ['main.cpp']
+simulate = ['simulator.cpp']
+ml = ['maximum_likelihood.cpp']
 
 Import('env')
-env.Program('bn',main+src)
+env.Program('simulator',simulate+src)
+env.Program('ml',ml+src)

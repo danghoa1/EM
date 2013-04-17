@@ -1,3 +1,18 @@
-- I included 3 datasets for the same network.  To pick 1 dataset, rename it to dataset.dat
-- To compile: type "g++ main.cpp bayesian_network.cpp  -o ./main" (without quote)
-- To run: type "./main" (without quote)
+simulator:
+
+-i <path/file> : path to bayesian network input file
+
+-o <path/file> : path to simulated dataset output file
+
+-s <int> : seed value
+
+-n <int> : number of cases in dataset
+
+-h : toogle to simulate incomplete data
+
+
+ml:
+
+-i <path/file> : path to bayesian network input file
+
+-d <path/file> : path to simulated dataset input file

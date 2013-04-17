@@ -30,7 +30,7 @@ int BayesNetwork::positionInCPT(int* data, int i)
 
 // Main functions
 
-void BayesNetwork::Read(const char* networkFilePath)
+void BayesNetwork::Read(char* networkFilePath)
 {
 	//Initialize
 
@@ -190,7 +190,7 @@ void BayesNetwork::Learn(const char* datasetFilePath)
 	}
 }
 
-void BayesNetwork::Simulate(const char* simulateDatasetFilePath, int Ncases)
+void BayesNetwork::Simulate(const char* simulateDatasetFilePath, int Ncases, bool incomplete, int seed)
 {
 	//Initialize & Set up unnormalized CPT Table 
 	ofstream dsFile;
@@ -209,7 +209,7 @@ void BayesNetwork::Simulate(const char* simulateDatasetFilePath, int Ncases)
 	
 	//Generate dataset cases, assuming topological order
 	
-	RandomGenerator randomGen(time(NULL));
+	RandomGenerator randomGen(seed);
 	
 	for (int c=1; c <= Ncases; c++)
 	{

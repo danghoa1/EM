@@ -14,9 +14,9 @@ class BayesNetwork
 public:
 	BayesNetwork();
 	int positionInCPT(int* data, int i);
-	virtual void Read(const char* networkFilePath);				//Create network from file
+	virtual void Read(char* networkFilePath);				//Create network from file
 	virtual void Learn(const char* datasetFilePath);			//Learn parameters from file
-	virtual void Simulate(const char* simulateDatasetFilePath, int Ncases);	//Simulate dataset from network
+	virtual void Simulate(const char* simulateDatasetFilePath, int Ncases, bool incomplete, int seed);	//Simulate dataset from network
 	virtual void Print();
 protected:
 
