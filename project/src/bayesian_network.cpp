@@ -12,9 +12,32 @@ using namespace std;
 BayesNetwork::BayesNetwork()
 {
 	Nnodes = 0;
+	Ncases = 0;
 }
 
-// Helper Functions
+BayesNetwork::~BayesNetwork()
+{
+	for(int i=0; i < Ncases; i++)
+		delete [] dataset[i];
+}
+// Helper Functions ------------------------------------
+
+void BayesNetwork::normalizeCPT(int i)
+{
+	int j=0;
+	while (j < this->nodes[i].Ncpt)
+	{
+		double total = 0;
+		for (int k=0; k < this->nodes[i].cardinality; k++)
+			total += this->nodes[i].cpt[j+k];
+		
+		for (int k=0; k < this->nodes[i].cardinality; k++)
+			this->nodes[i].cpt[j+k] /= total;
+		
+		j += this->nodes[i].cardinality;
+	}
+}
+
 
 int BayesNetwork::positionInCPT(int* data, int i)
 {
@@ -28,9 +51,9 @@ int BayesNetwork::positionInCPT(int* data, int i)
 	return CPTposition;
 }
 
-// Main functions
+// Main functions -----------------------------------------
 
-void BayesNetwork::Read(char* networkFilePath)
+void BayesNetwork::ReadNetwork(char* networkFilePath)
 {
 	//Initialize
 
@@ -104,9 +127,28 @@ void BayesNetwork::Read(char* networkFilePath)
 	netFile.close();
 }
 
-void BayesNetwork::Learn(const char* datasetFilePath)
+void BayesNetwork::Learn()
 {
 
+	for (int c=0; c < Ncases; c++)
+	{
+
+		for(int i=0; i < this->Nnodes; i++)
+		{
+			int CPTposition = positionInCPT(dataset[c],i);
+			this->nodes[i].cpt[CPTposition] +=1;
+		}	
+	}
+	
+	//Normalize
+	for (int i =0; i < this->Nnodes; i++)
+	{
+		normalizeCPT(i);
+	}
+}
+
+void BayesNetwork::ReadDataset(char* datasetFilePath)
+{
 	//Initialize & Set up unnormalized CPT Table 
 
 	ifstream dsFile;
@@ -134,7 +176,7 @@ void BayesNetwork::Learn(const char* datasetFilePath)
 
 	while (dsFile.eof()==false)
 	{
-		int a[this->Nnodes];
+		int* a = new int[this->Nnodes];
 		bool legalCase= true;		
 		for (int i=0; i< this->Nnodes; i++)
 		{
@@ -146,9 +188,17 @@ void BayesNetwork::Learn(const char* datasetFilePath)
 			
 			if (str != "")
 			{
-				str = str.substr(1);
-				const char* cstr = str.c_str();
-				int val = atoi(cstr);
+				int val;
+				if (str == "?") 		// Incomplete data
+				{
+					val = -1;
+				}
+				else
+				{
+					str = str.substr(1);
+					const char* cstr = str.c_str();
+					val = atoi(cstr);
+				}
 				a[header[i]] = val;		//Order according to header
 			}
 			else 
@@ -158,36 +208,14 @@ void BayesNetwork::Learn(const char* datasetFilePath)
 			}
 		}
 		
-		// Learn from each row of data
+		// Insert data row
 		if (legalCase)
 		{
-
-			for(int i=0; i < this->Nnodes; i++)
-			{
-				int CPTposition = positionInCPT(a,i);
-				this->nodes[i].cpt[CPTposition] +=1;
-			}	
+			dataset.push_back(a);
+			Ncases++;
 		}
 	}
 	dsFile.close();
-	
-	//Normalize
-	for (int i =0; i < this->Nnodes; i++)
-	{
-		int j=0;
-		while (j < this->nodes[i].Ncpt)
-		{
-			double total = 0;
-			for (int k=0; k < this->nodes[i].cardinality; k++)
-				total += this->nodes[i].cpt[j+k];
-			
-			for (int k=0; k < this->nodes[i].cardinality; k++)
-				this->nodes[i].cpt[j+k] /= total;
-			
-			j += this->nodes[i].cardinality;
-		}
-
-	}
 }
 
 void BayesNetwork::Simulate(const char* simulateDatasetFilePath, int Ncases, bool incomplete, int seed)

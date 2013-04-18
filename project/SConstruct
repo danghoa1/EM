@@ -6,7 +6,7 @@ mode = ARGUMENTS.get('mode',None)
 lib = []
 
 # compile
-env = Environment(CC='g++',CCFLAGS='',
+env = Environment(CC='g++',CCFLAGS='-Wall -finline-functions -Wno-write-strings ',
                   CPPPATH='#/include',
                   LIBS=lib,LIBPATH='#/libs')
 env.Append(CCFLAGS='-O2')

@@ -46,9 +46,15 @@ int main(int argc, char **argv)
 	// Read network
 	sw.Start();
 	BayesNetwork net;
-	net.Read(ifile);
+	net.ReadNetwork(ifile);
 	sw.End();
 	sw.Print("Read network:");
+
+	// Read dataset
+	sw.Start();
+	net.ReadDataset(dfile);
+	sw.End();
+	sw.Print("Read dataset:");
 
 	// Maximum Likelihood
 	sw.Start();
