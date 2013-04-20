@@ -18,30 +18,24 @@ public:
 	~BayesNetwork();
 	void ReadNetwork(char* networkFilePath);	//Create network from file
 	void ReadDataset(char* datasetFilePath);	//Store dataset from file
-	void Learn(const char* datasetFilePath);	//Learn parameters from dataset
+	void Learn();	//Learn parameters from dataset
 	void Simulate(const char* simulateDatasetFilePath, int Ncases, bool incomplete, int seed);	//Simulate dataset from network
-	void EM(const char* datasetFilePath);
+	void EM();
 	virtual void Print();
 protected:
 
 // Network Info
-	struct Node
-	{
-		int parents[MAX_NUMBER_OF_PARENTS];
-		int Nparents;
-		
-		int cardinality;
-		
-		double cpt[MAX_CPT_LENGTH];
-		int Ncpt;	
-	};
-
-	Node nodes[MAX_NUMBER_OF_NODES];
-	int Nnodes;	
+	
+	int** m_parents;	// Array of parents for each node
+	int* m_Nparents;	// Number of parents for each node
+	int* m_cardinality;	// Cardinality for each node
+	double** m_cpt;		// CPT table for each node
+	int* m_Ncpt;		// CPT Length for each node
+	int m_Nnodes;		// Number of nodes
 
 // Dataset Info
-	vector< int *> dataset;
-	int Ncases;
+	int** m_dataset;
+	int m_Ncases;
 
 // Helper functions
 	int positionInCPT(int* data, int i);	

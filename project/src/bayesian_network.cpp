@@ -11,30 +11,46 @@ using namespace std;
 
 BayesNetwork::BayesNetwork()
 {
-	Nnodes = 0;
-	Ncases = 0;
+	m_Nnodes = 0;
+	m_Ncases = 0;
 }
 
 BayesNetwork::~BayesNetwork()
 {
-	for(int i=0; i < Ncases; i++)
-		delete [] dataset[i];
+	if (m_dataset != NULL)
+	{
+		for(int i=0; i < m_Ncases; i++)
+			delete [] m_dataset[i];
+	}
+
+	if (m_parents != NULL)
+	{
+		for(int i=0; i < m_Nnodes; i++)
+		{
+			delete [] m_parents[i];
+			delete [] m_cpt[i];
+		}
+	}
+
+	if (m_Nparents != NULL) delete [] m_Nparents;
+	if (m_Ncpt != NULL) delete [] m_Ncpt;
+	if (m_cardinality != NULL) delete [] m_cardinality;
 }
 // Helper Functions ------------------------------------
 
 void BayesNetwork::normalizeCPT(int i)
 {
 	int j=0;
-	while (j < this->nodes[i].Ncpt)
+	while (j < m_Ncpt[i])
 	{
 		double total = 0;
-		for (int k=0; k < this->nodes[i].cardinality; k++)
-			total += this->nodes[i].cpt[j+k];
+		for (int k=0; k < m_cardinality[i]; k++)
+			total += m_cpt[i][j+k];
 		
-		for (int k=0; k < this->nodes[i].cardinality; k++)
-			this->nodes[i].cpt[j+k] /= total;
+		for (int k=0; k < m_cardinality[i]; k++)
+			m_cpt[i][j+k] /= total;
 		
-		j += this->nodes[i].cardinality;
+		j += m_cardinality[i];
 	}
 }
 
@@ -42,11 +58,11 @@ void BayesNetwork::normalizeCPT(int i)
 int BayesNetwork::positionInCPT(int* data, int i)
 {
 	int CPTposition = data[i];
-	int multiplier = this->nodes[i].cardinality;
-	for (int j = (this->nodes[i].Nparents - 1); j>=0; j--)
+	int multiplier = m_cardinality[i];
+	for (int j = (m_Nparents[i] - 1); j>=0; j--)
 	{
-		CPTposition += data[this->nodes[i].parents[j]] * multiplier;
-		multiplier *= this->nodes[this->nodes[i].parents[j]].cardinality;
+		CPTposition += data[m_parents[i][j]] * multiplier;
+		multiplier *= m_cardinality[m_parents[i][j]];
 	}
 	return CPTposition;
 }
@@ -67,60 +83,67 @@ void BayesNetwork::ReadNetwork(char* networkFilePath)
 
 	// Read number of nodes
 
-	netFile>> this->Nnodes;
+	netFile>> m_Nnodes;
+
+	// Intialize arrays
+
+	m_parents = new int*[m_Nnodes];
+	m_Nparents = new int[m_Nnodes];
+	m_cardinality = new int[m_Nnodes];
+	m_cpt = new double*[m_Nnodes];
+	m_Ncpt = new int[m_Nnodes];
 
 	// Read the number of states for each node
 
-	for(int i=0; i < this->Nnodes; i++)
+	for(int i=0; i < m_Nnodes; i++)
 	{
 		int cardinality;
 		netFile>>cardinality;
 		
 		// Create new node
-		this->nodes[i].cardinality = cardinality;
-		this->nodes[i].Ncpt = cardinality;
-		this->nodes[i].Nparents = 0;
+		m_cardinality[i] = cardinality;
+		m_Nparents[i] = 0;
 	}
 
-	// Read the number of cliques
+	// Read the number of CPT tables
 
-	int Ncliques;
-	netFile>>Ncliques;
+	int Nfunctions;
+	netFile>>Nfunctions;
 
 	// Read each clique
 
-	for(int i=0; i < Ncliques; i++)
+	for(int i=0; i < Nfunctions; i++)
 	{
 		int numVariables;
 		netFile>>numVariables;
-		int previous = -1;
+		
+		// Initialize parent array
+		m_Nparents[i] = numVariables - 1;
+		m_parents[i] = new int[m_Nparents[i]];
 		
 		// Insert parents
 		for (int j=0; j < numVariables; j++)
 		{
-			int current;
-			netFile >> current;
-			
-			if (previous!=-1)
-			{
-				this->nodes[current].parents[this->nodes[current].Nparents] = previous;
-				this->nodes[current].Nparents++;
-				
-				this->nodes[current].Ncpt *= this->nodes[previous].cardinality;
-			}
-			previous = current;
+			int parent;
+			netFile >> parent;
+
+			if (j < numVariables)
+				m_parents[i][j] = parent;
 		}
 		
 	}
 	
 	// Read CPT Table
 	
-	for (int i=0; i < this->Nnodes; i++)
+	for (int i=0; i < m_Nnodes; i++)
 	{
-		int Nentries;
-		netFile >> Nentries;
-		for (int j=0; j< this->nodes[i].Ncpt; j++)
-			netFile >> this->nodes[i].cpt[j];	
+		netFile >> m_Ncpt[i];
+
+		// Initialize CPT table
+		m_cpt[i] = new double[m_Ncpt[i]];
+
+		for (int j=0; j< m_Ncpt[i]; j++)
+			netFile >> m_cpt[i][j];	
 	}
 	
 	
@@ -130,18 +153,18 @@ void BayesNetwork::ReadNetwork(char* networkFilePath)
 void BayesNetwork::Learn()
 {
 
-	for (int c=0; c < Ncases; c++)
+	for (int c=0; c < m_Ncases; c++)
 	{
 
-		for(int i=0; i < this->Nnodes; i++)
+		for(int i=0; i < m_Nnodes; i++)
 		{
-			int CPTposition = positionInCPT(dataset[c],i);
-			this->nodes[i].cpt[CPTposition] +=1;
+			int CPTposition = positionInCPT(m_dataset[c],i);
+			m_cpt[i][CPTposition] +=1;
 		}	
 	}
 	
 	//Normalize
-	for (int i =0; i < this->Nnodes; i++)
+	for (int i =0; i < m_Nnodes; i++)
 	{
 		normalizeCPT(i);
 	}
@@ -153,15 +176,17 @@ void BayesNetwork::ReadDataset(char* datasetFilePath)
 
 	ifstream dsFile;
 	dsFile.open(datasetFilePath);
+	dsFile >> m_Ncases;
+	m_dataset = new int*[m_Ncases];
 
 	//Set up header ordering
 
-	int header[this->Nnodes];
+	int header[m_Nnodes];
 
-	for (int i=0; i < this->Nnodes; i++)
+	for (int i=0; i < m_Nnodes; i++)
 	{
 		string str;
-		if (i+1 < this->Nnodes)
+		if (i+1 < m_Nnodes)
 			getline(dsFile,str,',');
 		else
 			getline(dsFile,str,'\n');
@@ -174,14 +199,16 @@ void BayesNetwork::ReadDataset(char* datasetFilePath)
 
 	//Read line by line
 
+	int readCount = 0;
+	
 	while (dsFile.eof()==false)
 	{
-		int* a = new int[this->Nnodes];
+		int* a = new int[m_Nnodes];
 		bool legalCase= true;		
-		for (int i=0; i< this->Nnodes; i++)
+		for (int i=0; i< m_Nnodes; i++)
 		{
 			string str;
-			if (i+1 < this->Nnodes)
+			if (i+1 < m_Nnodes)
 				getline(dsFile,str,',');
 			else
 				getline(dsFile,str,'\n');
@@ -211,8 +238,8 @@ void BayesNetwork::ReadDataset(char* datasetFilePath)
 		// Insert data row
 		if (legalCase)
 		{
-			dataset.push_back(a);
-			Ncases++;
+			m_dataset[readCount] = a;
+			readCount++;
 		}
 	}
 	dsFile.close();
@@ -220,29 +247,34 @@ void BayesNetwork::ReadDataset(char* datasetFilePath)
 
 void BayesNetwork::Simulate(const char* simulateDatasetFilePath, int Ncases, bool incomplete, int seed)
 {
+	
 	//Initialize & Set up unnormalized CPT Table 
 	ofstream dsFile;
 	dsFile.open(simulateDatasetFilePath);
 	
+
+	// Print number of cases
+	dsFile<<Ncases<<endl;
+
 	//Print header
-	for (int i=0; i<this->Nnodes;i++)
+	for (int i=0; i<m_Nnodes;i++)
 	{
 		dsFile<<"x"<<i;
-		if ( i < (this->Nnodes -1))
+		if ( i < (m_Nnodes -1))
 			dsFile<<",";
 		else
 			dsFile<<endl;
 	}
 
 	
-	//Generate dataset cases, assuming topological order
+	//Generate m_dataset cases, assuming topological order
 	
 	RandomGenerator randomGen(seed);
 	
 	for (int c=1; c <= Ncases; c++)
 	{
-		int dataRow[this->Nnodes];
-		for (int i=0; i < this->Nnodes; i++)
+		int dataRow[m_Nnodes];
+		for (int i=0; i < m_Nnodes; i++)
 		{
 			dataRow[i] = 0;	
 			
@@ -255,9 +287,9 @@ void BayesNetwork::Simulate(const char* simulateDatasetFilePath, int Ncases, boo
 				double rand = randomGen.Randomize();
 			
 			
-				for (int j=0; j<this->nodes[i].cardinality; j++)
+				for (int j=0; j<m_cardinality[i]; j++)
 				{
-					accumulate += this->nodes[i].cpt[CPTposition+j];
+					accumulate += m_cpt[i][CPTposition+j];
 					if (rand <= accumulate)
 					{
 						dataRow[i] = j;
@@ -269,10 +301,10 @@ void BayesNetwork::Simulate(const char* simulateDatasetFilePath, int Ncases, boo
 		}
 		
 		//Print row
-		for (int i=0; i<this->Nnodes;i++)
+		for (int i=0; i<m_Nnodes;i++)
 		{
 			dsFile<<"s"<<dataRow[i];
-			if ( i < (this->Nnodes -1))
+			if ( i < (m_Nnodes -1))
 				dsFile<<",";
 			else
 				dsFile<<endl;
@@ -286,14 +318,14 @@ void BayesNetwork::Print()
 	cout.setf(ios::fixed); 
     	cout.precision(5);
 	
-	for(int i=0; i< this->Nnodes; i++)
+	for(int i=0; i< m_Nnodes; i++)
 	{
 		cout<<"Node "<<i<<"'s CPT:"<<endl;		
 
-		for (int j=0; j < this->nodes[i].Ncpt; j++)
+		for (int j=0; j < m_Ncpt[i]; j++)
 		{
-			cout<< this->nodes[i].cpt[j];
-			if ((j+1) % this->nodes[i].cardinality == 0) cout<<endl;
+			cout<< m_cpt[i][j];
+			if ((j+1) % m_cardinality[i] == 0) cout<<endl;
 			else cout<<"  ";
 		}
 		cout<<endl;

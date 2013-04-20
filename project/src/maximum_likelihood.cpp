@@ -58,7 +58,7 @@ int main(int argc, char **argv)
 
 	// Maximum Likelihood
 	sw.Start();
-	net.Learn(dfile);
+	net.Learn();
 	sw.End();
 	sw.Print("Maximum Likelihood:");
 	net.Print();
