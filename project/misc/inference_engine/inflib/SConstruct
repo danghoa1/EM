@@ -1,0 +1,3 @@
+Java('lib', 'src', 
+     JAVAVERSION='1.6',
+     JAVACLASSPATH=["lib","lib/inflib.jar"])

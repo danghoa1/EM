@@ -1,12 +1,18 @@
 <SamiamPreferences>
-	<DefaultPath>/home/danghoa1/Work/samiam/network_samples</DefaultPath>
+	<DefaultPath>/home/danghoa1/Work/EM/project/misc/inference_engine/samiam/network_samples</DefaultPath>
 	<FileExtension>.net</FileExtension>
 	<SecondsPerRCCall>2.018421361862025E-6</SecondsPerRCCall>
-	<RecentDocuments>/home/danghoa1/Work/samiam/network_samples/cancer_for_EM.net;</RecentDocuments>
-	<Algorithm>null</Algorithm>
+	<RecentDocuments>/home/danghoa1/Work/samiam/network_samples/cancer_for_EM.net;/home/danghoa1/Work/EM/project/misc/inference_engine/samiam/network_samples/cancer_for_EM.net;</RecentDocuments>
+	<Algorithm>propagationenginegenerator1791944048146838126L</Algorithm>
+	<Property key="visibletoolbar">true</Property>
+	<Property key="visibleinstantiationclipboardtoolbar">true</Property>
+	<Property key="orientationinstantiationclipboardtoolbar">1</Property>
+	<Property key="LastCodeBanditLocation">/home/danghoa1/Work/EM/project/misc/inference_engine/samiam</Property>
+	<Property key="visiblestatusbar">true</Property>
+	<Property key="constraintsinstantiationclipboardtoolbar">East</Property>
 	<PreferenceGroup name="Inference">
 		<pref class="edu.ucla.belief.ui.preference.IntegerPreference" key="inferenceMinFillRepetitions" value="7" name="Min fill, best of N repetitions" />
-		<pref class="edu.ucla.belief.ui.preference.IntegerPreference" key="inferenceMinFillSeed" value="234576118" name="Min fill, new random seed (not saved)" />
+		<pref class="edu.ucla.belief.ui.preference.IntegerPreference" key="inferenceMinFillSeed" value="1968493547" name="Min fill, new random seed (not saved)" />
 		<pref class="edu.ucla.belief.ui.preference.BooleanPreference" key="inferenceMAPExplorerFullScreenWidth" value="true" name="MAP Solution Explorer, maximize width" />
 		<pref class="edu.ucla.belief.ui.preference.BooleanPreference" key="askBeforeCPTCopy" value="true" name="Ask before modifying cpt (cpt copy tool)" />
 		<pref class="edu.ucla.belief.ui.preference.EnumPreference$Caste" key="inferenceCaste" value="retard" name="User level (cpt copy tool)" />

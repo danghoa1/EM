@@ -56,9 +56,9 @@ int main(int argc, char **argv)
 	sw.End();
 	sw.Print("Read dataset:");
 
-	// Maximum Likelihood
+	// Expectation Maximization
 	sw.Start();
-	net.learnML();
+	net.learnEM();
 	sw.End();
 	sw.Print("Maximum Likelihood:");
 	net.print();

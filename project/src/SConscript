@@ -2,7 +2,11 @@
 src = ['bayesian_network.cpp','stopwatch.cpp','random_generator.cpp']
 simulate = ['simulator.cpp']
 ml = ['maximum_likelihood.cpp']
+testRead = ['testRead.cpp']
+em = ['em.cpp']
 
 Import('env')
 env.Program('simulator',simulate+src)
 env.Program('ml',ml+src)
+env.Program('testRead',testRead+src)
+env.Program('em',em+src)

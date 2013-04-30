@@ -18,6 +18,7 @@ int main(int argc, char **argv)
 	int nflag = 0;			//dataset count
 	int nvalue = 0;
 	int hflag = 0;			//hidden values
+	double hvalue = 0;
 	int c;
 	opterr = 1;
 
@@ -43,6 +44,7 @@ int main(int argc, char **argv)
 				break;
 			case 'h':
 				hflag = 1;
+				hvalue = atof(optarg);
 				break;
 			default:
 				abort();
@@ -67,18 +69,20 @@ int main(int argc, char **argv)
 	if (nflag == 1)
 		ncases = nvalue;
 
-	bool incomplete = (bool) hflag;
+	double hideProbability = 0.02;
+	if (hflag == 1)
+		hideProbability = hvalue;
 
 	// Read network
 	sw.Start();
 	BayesNetwork net;
-	net.ReadNetwork(ifile);
+	net.readNetwork(ifile);
 	sw.End();
 	sw.Print("Read network:");
 
 	// Simulate
 	sw.Start();
-	net.Simulate(ofile,ncases,incomplete,seed);
+	net.simulate(ofile,ncases,hideProbability,seed);
 	sw.End();
 	sw.Print("Simulate dataset:");	
 }

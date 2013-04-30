@@ -26,7 +26,7 @@ import java.util.*;
   e.g. java -classpath .:inflib.jar ProbabilityQueryTutorial
 
   @author Keith Cascio
-  @since Apr 19, 2013 9:41:01 PM
+  @since Apr 28, 2013 9:42:47 PM
 */
 public class ProbabilityQueryTutorial
 {
@@ -42,7 +42,12 @@ public class ProbabilityQueryTutorial
   public void doProbabilityQuery( BeliefNetwork bn )
   {
     /* Define evidence, by id. */
-    Map evidence = Collections.EMPTY_MAP;
+    Map evidence = new HashMap(2);
+    FiniteVariable var = null;
+    var = (FiniteVariable) bn.forID( "C" );
+    evidence.put( var, var.instance( "Absent" ) );
+    var = (FiniteVariable) bn.forID( "A" );
+    evidence.put( var, var.instance( "Absent" ) );
 
     /* Create the Dynamator(edu.ucla.belief.inference.SynchronizedInferenceEngine). */
     edu.ucla.belief.approx.PropagationEngineGenerator dynamator = new edu.ucla.belief.approx.PropagationEngineGenerator();
@@ -86,7 +91,7 @@ public class ProbabilityQueryTutorial
   */
   public BeliefNetwork readNetworkFile()
   {
-    String path = "/home/danghoa1/Work/samiam/network_samples/cancer_for_EM.net";
+    String path = "/home/danghoa1/Work/EM/project/misc/inference_engine/samiam/network_samples/cancer_for_EM.net";
 
     BeliefNetwork ret = null;
     try{

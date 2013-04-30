@@ -3,7 +3,9 @@
 
 #include "bayesian_network.h"
 #include "random_generator.h"
+#include "inference_engine.h"
 #include <iostream>
+#include <string>
 #include <cstdlib>
 #include <fstream>
 
@@ -13,6 +15,12 @@ BayesNetwork::BayesNetwork()
 {
 	m_Nnodes = 0;
 	m_Ncases = 0;
+	m_dataset = NULL;
+	m_parents = NULL;
+	m_Nparents = NULL;
+	m_cardinality = NULL;
+	m_Ncpt = NULL;
+	m_cpt = NULL;
 }
 
 BayesNetwork::~BayesNetwork()
@@ -38,19 +46,19 @@ BayesNetwork::~BayesNetwork()
 }
 // Helper Functions ------------------------------------
 
-void BayesNetwork::normalizeCPT(int i)
+void BayesNetwork::normalizeCPT(int i, int cardinality, int Ncpt, double* cpt)
 {
 	int j=0;
-	while (j < m_Ncpt[i])
+	while (j < Ncpt)
 	{
 		double total = 0;
-		for (int k=0; k < m_cardinality[i]; k++)
-			total += m_cpt[i][j+k];
+		for (int k=0; k < cardinality; k++)
+			total += cpt[j+k];
 		
-		for (int k=0; k < m_cardinality[i]; k++)
-			m_cpt[i][j+k] /= total;
+		for (int k=0; k < cardinality; k++)
+			cpt[j+k] /= total;
 		
-		j += m_cardinality[i];
+		j += cardinality;
 	}
 }
 
@@ -69,7 +77,7 @@ int BayesNetwork::positionInCPT(int* data, int i)
 
 // Main functions -----------------------------------------
 
-void BayesNetwork::ReadNetwork(char* networkFilePath)
+void BayesNetwork::readNetwork(char* networkFilePath)
 {
 	//Initialize
 
@@ -93,6 +101,7 @@ void BayesNetwork::ReadNetwork(char* networkFilePath)
 	m_cpt = new double*[m_Nnodes];
 	m_Ncpt = new int[m_Nnodes];
 
+
 	// Read the number of states for each node
 
 	for(int i=0; i < m_Nnodes; i++)
@@ -104,6 +113,7 @@ void BayesNetwork::ReadNetwork(char* networkFilePath)
 		m_cardinality[i] = cardinality;
 		m_Nparents[i] = 0;
 	}
+
 
 	// Read the number of CPT tables
 
@@ -119,20 +129,21 @@ void BayesNetwork::ReadNetwork(char* networkFilePath)
 		
 		// Initialize parent array
 		m_Nparents[i] = numVariables - 1;
-		m_parents[i] = new int[m_Nparents[i]];
-		
-		// Insert parents
-		for (int j=0; j < numVariables; j++)
-		{
-			int parent;
-			netFile >> parent;
 
-			if (j < numVariables)
-				m_parents[i][j] = parent;
+		if (m_Nparents[i]>0)
+		{
+			m_parents[i] = new int[m_Nparents[i]];
+			
+			// Insert parents
+			for (int j=0; j < m_Nparents[i]; j++)
+				netFile >> m_parents[i][j];
 		}
 		
+		int dummy;
+		netFile >> dummy;
 	}
 	
+
 	// Read CPT Table
 	
 	for (int i=0; i < m_Nnodes; i++)
@@ -150,29 +161,122 @@ void BayesNetwork::ReadNetwork(char* networkFilePath)
 	netFile.close();
 }
 
-void BayesNetwork::Learn()
+void BayesNetwork::learnML()
 {
-
-	for (int c=0; c < m_Ncases; c++)
+	if (m_incomplete == false)
 	{
-
-		for(int i=0; i < m_Nnodes; i++)
+		cout <<"Complete data"<<endl;
+		for (int c=0; c < m_Ncases; c++)
 		{
-			int CPTposition = positionInCPT(m_dataset[c],i);
-			m_cpt[i][CPTposition] +=1;
-		}	
-	}
+
+			for(int i=0; i < m_Nnodes; i++)
+			{
+				int CPTposition = positionInCPT(m_dataset[c],i);
+				m_cpt[i][CPTposition] +=1;
+			}	
+		}
 	
-	//Normalize
-	for (int i =0; i < m_Nnodes; i++)
+		//Normalize
+		for (int i =0; i < m_Nnodes; i++)
+		{
+			normalizeCPT(i,m_cardinality[i],m_Ncpt[i],m_cpt[i]);
+		}
+	}
+	else
 	{
-		normalizeCPT(i);
+		cout<<endl<<"Incomplete data.  No learning is done."<<endl<<endl;
 	}
 }
 
-void BayesNetwork::ReadDataset(char* datasetFilePath)
+void BayesNetwork::learnEM()
+{
+	const int MAX_NUMBER_OF_ITERATION = 100;
+
+	double*** theta = new double**[MAX_NUMBER_OF_ITERATION];
+	
+	//Initialize theta(0)
+	double** zero = new double*[m_Nnodes];
+	for (int i=0; i<m_Nnodes;i++)
+	{
+		double* cpt = new double[m_Ncpt[i]];
+		double initValue = 1.0 / m_cardinality[i];
+		
+		for (int j=0; j<m_Ncpt[i]; j++)
+			cpt[j] = initValue;
+
+		zero[i] = cpt;
+	}
+	theta[0] = zero;
+
+	//Iterate
+	int k = 0;
+
+	while ((k+1)<MAX_NUMBER_OF_ITERATION)
+	{
+		k++;
+
+		// Initialize Inference Engine
+		InferenceEngine engine(m_Nnodes,m_cardinality,m_Nparents,m_parents,m_Ncpt,theta[k-1]);
+		
+		// Initialize New Array
+		double** cpts = new double*[m_Nnodes];
+		for (int i=0; i<m_Nnodes;i++)
+		{
+			double* cpt = new double[m_Ncpt[i]];
+			
+			for (int j=0; j< m_Ncpt[i]; j++)
+				cpt[j]  =0;
+
+			cpts[i] = cpt;
+		}
+
+		// Iterate over datasets
+		for (int i=0; i < m_Ncases;i++)
+		{
+			// Update evidence
+			engine.updateEvidence(m_dataset[i]);
+
+			for (int x=0; x < m_Nnodes; x++)
+			{
+				for (int u=0; u < m_Ncpt[x]; u++)
+				{
+					cpts[x][u] += engine.probability(x,u);
+				}
+			}
+		}
+
+		// Update theta
+		for (int i=0; i < m_Nnodes; i++)
+		{
+			normalizeCPT(i,m_cardinality[i],m_Ncpt[i], cpts[i]);		
+		}
+
+		theta[k] = cpts;
+	}
+	
+	// Copy cpts
+	for (int i=0; i < m_Nnodes; i++)
+		for (int j=0; j < m_Ncpt[i]; j++)
+			m_cpt[i][j] = theta[k][i][j];
+
+
+	// Dealloc
+	for (int i=0; i <= k; i++)
+	{
+		for (int j=0; j < m_Nnodes; j++)
+		{
+			delete [] theta[i][j];
+		}
+		delete [] theta[i];
+	}
+	delete [] theta;
+}
+
+void BayesNetwork::readDataset(char* datasetFilePath)
 {
 	//Initialize & Set up unnormalized CPT Table 
+	
+	m_incomplete = false;
 
 	ifstream dsFile;
 	dsFile.open(datasetFilePath);
@@ -216,9 +320,10 @@ void BayesNetwork::ReadDataset(char* datasetFilePath)
 			if (str != "")
 			{
 				int val;
-				if (str == "?") 		// Incomplete data
+				if (str.length()==1) 		// Incomplete data
 				{
 					val = -1;
+					m_incomplete = true;
 				}
 				else
 				{
@@ -245,7 +350,7 @@ void BayesNetwork::ReadDataset(char* datasetFilePath)
 	dsFile.close();
 }
 
-void BayesNetwork::Simulate(const char* simulateDatasetFilePath, int Ncases, bool incomplete, int seed)
+void BayesNetwork::simulate(const char* simulateDatasetFilePath, int Ncases, double hideProbability, int seed)
 {
 	
 	//Initialize & Set up unnormalized CPT Table 
@@ -303,7 +408,15 @@ void BayesNetwork::Simulate(const char* simulateDatasetFilePath, int Ncases, boo
 		//Print row
 		for (int i=0; i<m_Nnodes;i++)
 		{
-			dsFile<<"s"<<dataRow[i];
+			double rand = randomGen.Randomize();
+
+			// Hide data
+			if (rand<hideProbability)		
+				dsFile<<"?";
+			else
+				dsFile<<"s"<<dataRow[i];
+
+			// Add "," or new line
 			if ( i < (m_Nnodes -1))
 				dsFile<<",";
 			else
@@ -313,11 +426,13 @@ void BayesNetwork::Simulate(const char* simulateDatasetFilePath, int Ncases, boo
 	dsFile.close();	
 }
 
-void BayesNetwork::Print()
+void BayesNetwork::print()
 {
 	cout.setf(ios::fixed); 
     	cout.precision(5);
 	
+	cout<<endl;
+
 	for(int i=0; i< m_Nnodes; i++)
 	{
 		cout<<"Node "<<i<<"'s CPT:"<<endl;		
@@ -330,6 +445,8 @@ void BayesNetwork::Print()
 		}
 		cout<<endl;
 	}
+
+	cout<<endl;
 }
 
 #endif
