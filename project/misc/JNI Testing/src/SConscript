@@ -1,0 +1,7 @@
+# list of source files
+src = ['MyComplexClass.cpp','Factorial.cpp']
+myExample = ['main.cpp']
+
+
+Import('env')
+env.Program('myExample',myExample+src)

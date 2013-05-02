@@ -1,0 +1,14 @@
+<package name="basic_example">
+  	<object name="MyComplexClass">
+          	<method name="myVeryComplexComputation" returnType="long">
+	    		<param type="double" name="a" />
+			<param type="double" name="b" />
+		</method>
+	</object>
+
+	<object name="Factorial">
+		<method name="calculate" returnType="int">
+			<param type="int" name="n" />
+		</method>
+	</object>
+</package>

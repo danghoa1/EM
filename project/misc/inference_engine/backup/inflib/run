@@ -1,0 +1,6 @@
+#!/bin/bash
+
+cp=lib:lib/inflib.jar
+memops=-Xmx512m
+
+java ${memops} -cp ${cp} Test $*
