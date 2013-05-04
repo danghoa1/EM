@@ -83,6 +83,7 @@ void BayesNetwork::readNetwork(char* networkFilePath)
 
 	ifstream netFile;
 	netFile.open(networkFilePath);
+	m_filePath = networkFilePath;
 	
 	// Read network type
 
@@ -208,15 +209,16 @@ void BayesNetwork::learnEM()
 	}
 	theta[0] = zero;
 
+
+
 	//Iterate
 	int k = 0;
-
 	while ((k+1)<MAX_NUMBER_OF_ITERATION)
 	{
 		k++;
 
 		// Initialize Inference Engine
-		InferenceEngine engine(m_Nnodes,m_cardinality,m_Nparents,m_parents,m_Ncpt,theta[k-1]);
+		InferenceEngine engine(m_Nnodes,m_cardinality,m_Nparents,m_parents,m_Ncpt,theta[k-1],m_filePath);
 		
 		// Initialize New Array
 		double** cpts = new double*[m_Nnodes];

@@ -23,6 +23,7 @@ protected:
 	int** m_parents;	// Array of parents for each node
 	int* m_Ncpt;		// CPT Length for each node
 	double** m_cpt;		// CPT table for each node
+	char* m_filePath;
 
 // Dataset Info
 	bool m_incomplete;

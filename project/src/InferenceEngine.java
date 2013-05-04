@@ -30,65 +30,85 @@ import java.util.Collection;
 import java.util.List;
 import java.util.*;
 
-public class Test {
-    BeliefNetwork bn1;    // edu.ucla.belief library
-    BayesianNetwork bn2;  // il2 library
+public class JInferenceEngine{
 
-	public static void main(String[] args) {
-		if ( args.length != 1 ) { 
-			System.out.println("Usage: program .uai file");
-			return;
+	JavaVM* jvm;
+
+    	BeliefNetwork bn1;    // edu.ucla.belief library
+    	BayesianNetwork bn2;  // il2 library
+
+	InferenceEngine ie1;
+	JointEngine ie2;
+
+	// CONSTRUCTOR
+
+	public JInferenceEngine() 
+	{
+	}
+
+
+	public void loadBayesianNetwork(String filename)
+	{
+        	BeliefNetwork bn1 = UaiConverter.uaiToBeliefNetwork(filename);
+        	BayesianNetwork bn2 = UaiConverter.uaiToBayesianNetwork(filename);
+	}
+
+	public void updateCPTTable(int node, double[] cpt, int cptLength)
+	{
+		// TODO
+	}
+
+	public void startEngine(int[] dataset)
+	{
+	
+	// IE1
+		 
+		/* Define evidence, by id. */
+    		Map ie1Evidence = new HashMap(2);
+		for (int i=0; i < bn1.size(); i++)
+		{
+   			FiniteVariable var = null;
+   	 		var = (FiniteVariable) bn.forID( "x" + i);
+    			ie1Evidence.put( var, var.instance( "s" + dataset[i]);
 		}
-        String filename = args[0];
+		// Attach evidence to BN
+		
+    		try{
+      			bn1.getEvidenceController().setObservations( evidence );
+    		}catch( StateNotFoundException e ){
+      			System.err.println( "Error, failed to set evidence: " + e );
+    		};
 
-        BeliefNetwork bn1 = UaiConverter.uaiToBeliefNetwork(filename);
-        BayesianNetwork bn2 = UaiConverter.uaiToBayesianNetwork(filename);
-        Test test = new Test(bn1,bn2);
-        test.run();
+		// Load Engine
+        	InferenceEngine ie1 = startInferenceEngine1(bn1,bn2);
+
+
+	// IE2
+
+		// Load evidenee 
+
+		IntMap ie2Evidence = new Intmap();
+		for (int i=0; i < bn2.size(); i++)
+		{
+			ie2Evidence.putAtEnd(i,dataset[i]);
+		}
+
+		// Load Engine
+        	JointEngine ie2 = startInferenceEngine2(bn2);
+
+		// Set evidence
+		ie2.setEvidence(ie2Evidence);
 	}
 
-    /************************************************************
-     * CONSTRUCTOR
-     ************************************************************/
 
-	public Test(BeliefNetwork bn1, BayesianNetwork bn2) {
-        this.bn1 = bn1;
-        this.bn2 = bn2;
+	public double probability(int node, int cptPos)    //cptPos is in IL1 format
+	{
+		FiniteVariable var = (FiniteVariable)bn1.forID("x" + node);
+		return ie1.familyConditional(node).values()[cptPos];
 	}
 
-    /************************************************************
-     * TESTING STUFF
-     ************************************************************/
-
-    public void run() {
-        InferenceEngine ie1 = startInferenceEngine1(bn1,bn2); //AC: need2fix
-        JointEngine ie2 = startInferenceEngine2(bn2);
-
-	//Add evidence
-	IntMap evidence = new IntMap();
-	evidence.putAtEnd(1,1);
-	evidence.putAtEnd(2,1);
-	ie2.setEvidence(evidence);
 
 
-        System.out.printf("=== il1 inference engine ===\n");
-        System.out.printf("Pr(e) = %.2f\n",ie1.probability());
-        for (int i = 0; i < bn1.size(); i++) {
-            FiniteVariable var = (FiniteVariable)bn1.forID("x"+i);
-            edu.ucla.belief.Table t1 = ie1.familyConditional(var);
-            System.out.println(t1);
-            System.out.println();
-        }
-        System.out.println();
-
-        System.out.printf("=== il2 inference engine ===\n");
-        System.out.printf("Pr(e) = %.2f\n",ie2.prEvidence());
-        for (int i = 0; i < bn2.domain().size(); i++) {
-            il2.model.Table t2 = ie2.tableConditional(i);
-            System.out.println(t2);
-        }
-        
-    }
 
     /************************************************************
      * INFERENCE ENGINE STUFF
@@ -150,20 +170,7 @@ public class Test {
         settings.setJoinTree(jt.asJoinTreeIL1());
         InferenceEngine engine = dynamator.manufactureInferenceEngine(bn);
 
-	/* Define evidence, by id. */
-    	Map evidence = new HashMap(2);
-   	FiniteVariable var = null;
-    	var = (FiniteVariable) bn.forID( "x1" );
-    	evidence.put( var, var.instance( "s1" ) );
-    	var = (FiniteVariable) bn.forID( "x2" );
-    	evidence.put( var, var.instance( "s1" ) );
 	
-	/* Set evidence. */
-    	try{
-      		bn.getEvidenceController().setObservations( evidence );
-    	}catch( StateNotFoundException e ){
-      		System.err.println( "Error, failed to set evidence: " + e );
-    	};
 
 
         return engine;
