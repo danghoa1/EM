@@ -1,14 +1,27 @@
+# JAVA
+Java('', 'src',
+     JAVAVERSION='1.6',
+     JAVACLASSPATH=["libs","libs/inflib.jar"])
+
 # mode debug, profile, or default
 mode = ARGUMENTS.get('mode',None)
 
+#variable
+JAVA_HOME = '/usr/lib/jvm/java-7-openjdk-amd64'
+
+#includes
+includes = ['#/include',JAVA_HOME +'/include',JAVA_HOME + '/include/linux']
+libpath  = [JAVA_HOME + '/jre/lib/amd64',JAVA_HOME + '/jre/lib/amd64/server/']
+
+
 # libraries
 # lib = ['sdd','m']
-lib = []
+lib = ['jvm']
 
 # compile
 env = Environment(CC='g++',CCFLAGS='-Wall -finline-functions -Wno-write-strings ',
-                  CPPPATH='#/include',
-                  LIBS=lib,LIBPATH='#/libs')
+                  CPPPATH=includes,
+                  LIBS=lib,LIBPATH=libpath)
 env.Append(CCFLAGS='-O2')
 
 # if mode == 'debug':

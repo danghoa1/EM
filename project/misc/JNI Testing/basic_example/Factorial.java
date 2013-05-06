@@ -1,4 +1,3 @@
-package basic_example;
 
 public class Factorial
 {

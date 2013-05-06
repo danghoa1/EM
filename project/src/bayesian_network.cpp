@@ -11,7 +11,7 @@
 
 using namespace std;
 
-BayesNetwork::BayesNetwork()
+BayesNetwork::BayesNetwork(NetworkType type)
 {
 	m_Nnodes = 0;
 	m_Ncases = 0;
@@ -21,6 +21,7 @@ BayesNetwork::BayesNetwork()
 	m_cardinality = NULL;
 	m_Ncpt = NULL;
 	m_cpt = NULL;
+	m_type = type;
 }
 
 BayesNetwork::~BayesNetwork()
@@ -43,36 +44,6 @@ BayesNetwork::~BayesNetwork()
 	if (m_Nparents != NULL) delete [] m_Nparents;
 	if (m_Ncpt != NULL) delete [] m_Ncpt;
 	if (m_cardinality != NULL) delete [] m_cardinality;
-}
-// Helper Functions ------------------------------------
-
-void BayesNetwork::normalizeCPT(int i, int cardinality, int Ncpt, double* cpt)
-{
-	int j=0;
-	while (j < Ncpt)
-	{
-		double total = 0;
-		for (int k=0; k < cardinality; k++)
-			total += cpt[j+k];
-		
-		for (int k=0; k < cardinality; k++)
-			cpt[j+k] /= total;
-		
-		j += cardinality;
-	}
-}
-
-
-int BayesNetwork::positionInCPT(int* data, int i)
-{
-	int CPTposition = data[i];
-	int multiplier = m_cardinality[i];
-	for (int j = (m_Nparents[i] - 1); j>=0; j--)
-	{
-		CPTposition += data[m_parents[i][j]] * multiplier;
-		multiplier *= m_cardinality[m_parents[i][j]];
-	}
-	return CPTposition;
 }
 
 // Main functions -----------------------------------------
@@ -154,8 +125,20 @@ void BayesNetwork::readNetwork(char* networkFilePath)
 		// Initialize CPT table
 		m_cpt[i] = new double[m_Ncpt[i]];
 
-		for (int j=0; j< m_Ncpt[i]; j++)
-			netFile >> m_cpt[i][j];	
+		if (m_type == IL1)		// IL1 Format
+		{
+			for (int j=0; j< m_Ncpt[i]; j++)
+				netFile >> m_cpt[i][j];	
+		}
+		else if (m_type == IL2)	// IL2 Format
+		{
+			for (int j=0; j < m_Ncpt[i]; j++)
+			{
+				int il2 = IL1ToIL2(i,j);
+				netFile >> m_cpt[i][il2];
+			}	
+
+		}
 	}
 	
 	
@@ -191,11 +174,12 @@ void BayesNetwork::learnML()
 
 void BayesNetwork::learnEM()
 {
+
 	const int MAX_NUMBER_OF_ITERATION = 100;
 
 	double*** theta = new double**[MAX_NUMBER_OF_ITERATION];
 	
-	//Initialize theta(0)
+	//Initialize theta(0)  TODO
 	double** zero = new double*[m_Nnodes];
 	for (int i=0; i<m_Nnodes;i++)
 	{
@@ -209,16 +193,18 @@ void BayesNetwork::learnEM()
 	}
 	theta[0] = zero;
 
-
+	
+	// Initialize Inference Engine
+	InferenceEngine engine(m_Nnodes,m_cardinality,m_Nparents,m_parents,m_Ncpt,theta[0],m_filePath);
 
 	//Iterate
 	int k = 0;
 	while ((k+1)<MAX_NUMBER_OF_ITERATION)
 	{
 		k++;
+		// Update CPTs
+		engine.updateCPTs(theta[k-1]);
 
-		// Initialize Inference Engine
-		InferenceEngine engine(m_Nnodes,m_cardinality,m_Nparents,m_parents,m_Ncpt,theta[k-1],m_filePath);
 		
 		// Initialize New Array
 		double** cpts = new double*[m_Nnodes];
@@ -441,7 +427,11 @@ void BayesNetwork::print()
 
 		for (int j=0; j < m_Ncpt[i]; j++)
 		{
-			cout<< m_cpt[i][j];
+			if (m_type == IL1)		// IL1 format
+				cout<< m_cpt[i][j];
+			else if (m_type == IL2)		// IL2 format
+				cout << m_cpt[i][IL1ToIL2(i,j)];
+
 			if ((j+1) % m_cardinality[i] == 0) cout<<endl;
 			else cout<<"  ";
 		}
@@ -450,5 +440,87 @@ void BayesNetwork::print()
 
 	cout<<endl;
 }
+
+// Helper Functions ------------------------------------
+
+void BayesNetwork::normalizeCPT(int i, int cardinality, int Ncpt, double* cpt)
+{
+	if (m_type == IL1)		// IL1 format
+	{
+		int j=0;
+		while (j < Ncpt)
+		{
+			double total = 0;
+			for (int k=0; k < cardinality; k++)
+				total += cpt[j+k];
+		
+			for (int k=0; k < cardinality; k++)
+				cpt[j+k] /= total;
+		
+			j += cardinality;
+		}
+	}
+	else if (m_type == IL2)	// IL2 format
+	{
+		int multiplier = Ncpt / cardinality;
+		for (int j=0; j < multiplier; j++)
+		{
+			double total = 0;
+			for (int k=0; k < cardinality; k++)
+				total += cpt[j + k*multiplier];
+
+			for (int k=0; k < cardinality; k++)
+				cpt[j + k*multiplier] /= total;
+		}
+	}
+}
+
+
+int BayesNetwork::positionInCPT(int* data, int i)
+{
+	int CPTposition = 0;
+	if (m_type == IL1)		// IL1 format
+	{
+		CPTposition = data[i];
+		int multiplier = m_cardinality[i];
+		for (int j = (m_Nparents[i] - 1); j>=0; j--)
+		{
+			CPTposition += data[m_parents[i][j]] * multiplier;
+			multiplier *= m_cardinality[m_parents[i][j]];
+		}
+	}
+	else if (m_type == IL2)	// IL2 format
+	{	
+		CPTposition = 0;
+		int multiplier = 1;
+		for (int j = 0; j < m_Nparents[i]; j++)
+		{
+			CPTposition += data[m_parents[i][j]] * multiplier;
+			multiplier *= m_cardinality[m_parents[i][j]];
+		}
+		CPTposition += data[i] * multiplier;
+	}
+	return CPTposition;
+}
+
+int BayesNetwork::IL1ToIL2(int node, int il1)
+{
+	int il2=0;
+	int multiplier = m_Ncpt[node] / m_cardinality[node];
+	int multiplier2 = 1;
+	for (int i=0;  i < m_Nparents[node]; i++)
+	{
+		int val = il1 / multiplier;
+		il1 %= multiplier;
+		multiplier /= m_cardinality[m_parents[node][i]];
+
+		il2 += val * multiplier2;
+		multiplier2 *= m_cardinality[m_parents[node][i]];
+	}
+
+	il2 += il1 * multiplier2;
+	return il2;
+}
+
 
 #endif

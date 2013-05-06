@@ -5,7 +5,6 @@
 			<param type="double" name="b" />
 		</method>
 	</object>
-
 	<object name="Factorial">
 		<method name="calculate" returnType="int">
 			<param type="int" name="n" />

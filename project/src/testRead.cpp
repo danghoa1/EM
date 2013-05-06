@@ -36,7 +36,7 @@ int main(int argc, char **argv)
 	
 	// Read network
 	sw.Start();
-	BayesNetwork net;
+	BayesNetwork net(BayesNetwork::IL2);
 	net.readNetwork(ifile);
 	sw.End();
 	sw.Print("Read network:");

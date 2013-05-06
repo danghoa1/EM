@@ -3,4 +3,5 @@
 cp=lib:lib/inflib.jar
 memops=-Xmx512m
 
+java ${memops} -cp ${cp} TestIL2 $*
 java ${memops} -cp ${cp} Test $*

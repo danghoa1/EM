@@ -22,7 +22,7 @@ int main(int argc, char **argv)
 	int c;
 	opterr = 1;
 
-	while ((c = getopt (argc, argv, "i:o:s:n:h")) != -1)
+	while ((c = getopt (argc, argv, "i:o:s:n:h:")) != -1)
 	{
 		switch (c)
 		{
@@ -69,13 +69,13 @@ int main(int argc, char **argv)
 	if (nflag == 1)
 		ncases = nvalue;
 
-	double hideProbability = 0.02;
+	double hideProbability = 0;
 	if (hflag == 1)
 		hideProbability = hvalue;
 
 	// Read network
 	sw.Start();
-	BayesNetwork net;
+	BayesNetwork net(BayesNetwork::IL1);
 	net.readNetwork(ifile);
 	sw.End();
 	sw.Print("Read network:");

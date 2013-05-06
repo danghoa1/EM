@@ -1,4 +1,4 @@
-//package test;
+//package inflib;
 
 /** Import il1 classes. */
 import edu.ucla.belief.*;
@@ -30,85 +30,65 @@ import java.util.Collection;
 import java.util.List;
 import java.util.*;
 
-public class JInferenceEngine{
+public class IL2{
 
-	JavaVM* jvm;
+    	BayesianNetwork bn;  // il2 library
 
-    	BeliefNetwork bn1;    // edu.ucla.belief library
-    	BayesianNetwork bn2;  // il2 library
-
-	InferenceEngine ie1;
 	JointEngine ie2;
 
 	// CONSTRUCTOR
 
-	public JInferenceEngine() 
+	public IL2() 
 	{
 	}
-
 
 	public void loadBayesianNetwork(String filename)
 	{
-        	BeliefNetwork bn1 = UaiConverter.uaiToBeliefNetwork(filename);
-        	BayesianNetwork bn2 = UaiConverter.uaiToBayesianNetwork(filename);
+         	bn = UaiConverter.uaiToBayesianNetwork(filename);
 	}
 
-	public void updateCPTTable(int node, double[] cpt, int cptLength)
+	public void updateCPTTable(int node, double[] cpt)
 	{
-		// TODO
+		// Retrieve CPT from BN
+		il2.model.Table t = bn.cpts()[node];
+		double[] c = t.values();
+
+		// Update values in CPT
+		for (int i=0; i < cpt.length; i++)
+			c[i] = cpt[i];
+
+		// Inform IE that CPT has been modified
+		ie2.setTable(node,t);
 	}
 
-	public void startEngine(int[] dataset)
+	public void startEngine()
 	{
-	
-	// IE1
-		 
-		/* Define evidence, by id. */
-    		Map ie1Evidence = new HashMap(2);
-		for (int i=0; i < bn1.size(); i++)
-		{
-   			FiniteVariable var = null;
-   	 		var = (FiniteVariable) bn.forID( "x" + i);
-    			ie1Evidence.put( var, var.instance( "s" + dataset[i]);
-		}
-		// Attach evidence to BN
-		
-    		try{
-      			bn1.getEvidenceController().setObservations( evidence );
-    		}catch( StateNotFoundException e ){
-      			System.err.println( "Error, failed to set evidence: " + e );
-    		};
-
 		// Load Engine
-        	InferenceEngine ie1 = startInferenceEngine1(bn1,bn2);
+        	ie2 = startInferenceEngine2(bn);
+	}
 
-
-	// IE2
-
+	public void updateEvidence(int[] dataset)
+	{
 		// Load evidenee 
 
-		IntMap ie2Evidence = new Intmap();
-		for (int i=0; i < bn2.size(); i++)
+		IntMap ie2Evidence = new IntMap();
+		for (int i=0; i < dataset.length; i++)
 		{
-			ie2Evidence.putAtEnd(i,dataset[i]);
+			if (dataset[i]!=-1)
+			{
+				ie2Evidence.putAtEnd(i,dataset[i]);
+			}
 		}
 
-		// Load Engine
-        	JointEngine ie2 = startInferenceEngine2(bn2);
-
 		// Set evidence
+		
 		ie2.setEvidence(ie2Evidence);
 	}
 
-
-	public double probability(int node, int cptPos)    //cptPos is in IL1 format
+	public double probability(int node, int cptPos)    //cptPos is in IL2 format
 	{
-		FiniteVariable var = (FiniteVariable)bn1.forID("x" + node);
-		return ie1.familyConditional(node).values()[cptPos];
+		return ie2.tableConditional(node).values()[cptPos];
 	}
-
-
-
 
     /************************************************************
      * INFERENCE ENGINE STUFF
@@ -152,28 +132,6 @@ public class JInferenceEngine{
         else      // this JT construction has linear space complexity
             jt = EliminationOrders.bucketerJoinTree(sd,record.order);
         return jt;
-    }
-
-    /**
-     * starts il1 inference engine (Hugin)
-     */
-    public static InferenceEngine startInferenceEngine1(BeliefNetwork bn,
-                                                        BayesianNetwork bn2) {
-		edu.ucla.belief.inference.HuginEngineGenerator dynamator = 
-			new edu.ucla.belief.inference.HuginEngineGenerator();
-        edu.ucla.belief.inference.JoinTreeSettings settings = 
-            dynamator.getSettings((edu.ucla.belief.io.PropertySuperintendent)bn,
-                                  true);
-        //il2.bridge.Converter converter = new il2.bridge.Converter();
-        //bn2 = converter.convert(bn);
-        EliminationOrders.JT jt = getJoinTree(bn2);
-        settings.setJoinTree(jt.asJoinTreeIL1());
-        InferenceEngine engine = dynamator.manufactureInferenceEngine(bn);
-
-	
-
-
-        return engine;
     }
 
     /**

@@ -1,4 +1,4 @@
-//package test;
+//package inflib;
 
 /** Import il1 classes. */
 import edu.ucla.belief.*;

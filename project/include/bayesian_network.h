@@ -4,7 +4,13 @@
 class BayesNetwork
 {
 public:
-	BayesNetwork();
+
+	enum NetworkType {
+		IL1 = 1,
+		IL2 = 2
+	};
+
+	BayesNetwork(NetworkType type = IL2);
 	~BayesNetwork();
 	void readNetwork(char* networkFilePath);	//Create network from file
 	void readDataset(char* datasetFilePath);	//Store dataset from file
@@ -24,16 +30,22 @@ protected:
 	int* m_Ncpt;		// CPT Length for each node
 	double** m_cpt;		// CPT table for each node
 	char* m_filePath;
+	enum NetworkType m_type;	// IL1 or IL2
+
 
 // Dataset Info
 	bool m_incomplete;
 	int** m_dataset;
 	int m_Ncases;
 
-// Helper functions
-	int positionInCPT(int* data, int i);	
-	void normalizeCPT(int i, int cardinality, int Ncpt, double* cpt);
-};
+// Private functions
 
+void normalizeCPT(int i, int cardinality, int Ncpt, double* cpt);
+
+int positionInCPT(int* data, int i);
+
+int IL1ToIL2(int node, int il1);
+
+};
 
 #endif

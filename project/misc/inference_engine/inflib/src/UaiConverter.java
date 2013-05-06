@@ -1,4 +1,4 @@
-//package edml;
+//package inflib;
 
 import edu.ucla.belief.BeliefNetwork;
 import edu.ucla.belief.FiniteVariable;
