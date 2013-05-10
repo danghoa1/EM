@@ -3,6 +3,7 @@
 *.slo
 *.lo
 *.o
+*.class
 
 # Compiled Dynamic libraries
 *.so
@@ -14,6 +15,7 @@
 *.a
 
 *~
+*.log
 .sconsign.dblite
 bin/
 output/
