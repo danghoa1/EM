@@ -10,6 +10,7 @@ class RandomGenerator
 {
 public:
 	RandomGenerator(int seed);
+	~RandomGenerator();
 	double Randomize();
 	
 

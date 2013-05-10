@@ -8,6 +8,12 @@ RandomGenerator::RandomGenerator(int seed)
 	dist = new boost::random::uniform_int_distribution<>(0,MAX_RANDOM_RANGE);
 }
 
+RandomGenerator::~RandomGenerator()
+{
+  delete gen;
+  delete dist;
+}
+
 double RandomGenerator::Randomize()
 {
 	return ((*dist)(*gen)/(double) MAX_RANDOM_RANGE);
