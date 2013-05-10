@@ -86,7 +86,6 @@ void BayesNetwork::readNetwork(char* networkFilePath)
 		m_Nparents[i] = 0;
 	}
 
-
 	// Read the number of CPT tables
 
 	int Nfunctions;
@@ -115,13 +114,11 @@ void BayesNetwork::readNetwork(char* networkFilePath)
 		netFile >> dummy;
 	}
 	
-
 	// Read CPT Table
 	
 	for (int i=0; i < m_Nnodes; i++)
 	{
 		netFile >> m_Ncpt[i];
-
 		// Initialize CPT table
 		m_cpt[i] = new double[m_Ncpt[i]];
 
@@ -140,7 +137,6 @@ void BayesNetwork::readNetwork(char* networkFilePath)
 
 		}
 	}
-	
 	
 	netFile.close();
 }
@@ -453,9 +449,9 @@ void BayesNetwork::normalizeCPT(int i, int cardinality, int Ncpt, double* cpt)
 			double total = 0;
 			for (int k=0; k < cardinality; k++)
 				total += cpt[j+k];
-		
-			for (int k=0; k < cardinality; k++)
-				cpt[j+k] /= total;
+			if (total > 0)
+				for (int k=0; k < cardinality; k++)
+					cpt[j+k] /= total;
 		
 			j += cardinality;
 		}
@@ -468,9 +464,9 @@ void BayesNetwork::normalizeCPT(int i, int cardinality, int Ncpt, double* cpt)
 			double total = 0;
 			for (int k=0; k < cardinality; k++)
 				total += cpt[j + k*multiplier];
-
-			for (int k=0; k < cardinality; k++)
-				cpt[j + k*multiplier] /= total;
+			if (total > 0)
+				for (int k=0; k < cardinality; k++)
+					cpt[j + k*multiplier] /= total;
 		}
 	}
 }
@@ -506,13 +502,13 @@ int BayesNetwork::positionInCPT(int* data, int i)
 int BayesNetwork::IL1ToIL2(int node, int il1)
 {
 	int il2=0;
-	int multiplier = m_Ncpt[node] / m_cardinality[node];
+	int multiplier = m_Ncpt[node];
 	int multiplier2 = 1;
 	for (int i=0;  i < m_Nparents[node]; i++)
 	{
+		multiplier /= m_cardinality[m_parents[node][i]];
 		int val = il1 / multiplier;
 		il1 %= multiplier;
-		multiplier /= m_cardinality[m_parents[node][i]];
 
 		il2 += val * multiplier2;
 		multiplier2 *= m_cardinality[m_parents[node][i]];
