@@ -264,8 +264,11 @@ void BayesNetwork::readDataset(char* datasetFilePath)
 
 	ifstream dsFile;
 	dsFile.open(datasetFilePath);
+	int Nnodes;
+	dsFile >> Nnodes;
 	dsFile >> m_Ncases;
 	m_dataset = new int*[m_Ncases];
+
 
 	//Set up header ordering
 
@@ -342,8 +345,10 @@ void BayesNetwork::simulate(const char* simulateDatasetFilePath, int Ncases, dou
 	dsFile.open(simulateDatasetFilePath);
 	
 
-	// Print number of cases
-	dsFile<<Ncases<<endl;
+	// Print number of cases & number of nodes
+	dsFile<<m_Nnodes<<" "<<Ncases<<endl;
+
+
 
 	//Print header
 	for (int i=0; i<m_Nnodes;i++)
