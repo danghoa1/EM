@@ -449,10 +449,18 @@ void BayesNetwork::normalizeCPT(int i, int cardinality, int Ncpt, double* cpt)
 			double total = 0;
 			for (int k=0; k < cardinality; k++)
 				total += cpt[j+k];
+
 			if (total > 0)
+			{
 				for (int k=0; k < cardinality; k++)
 					cpt[j+k] /= total;
-		
+			}
+			else
+			{
+				for (int k=0; k < cardinality; k++)
+					cpt[j+k] = 1.0 / cardinality;
+			}
+
 			j += cardinality;
 		}
 	}
@@ -465,8 +473,15 @@ void BayesNetwork::normalizeCPT(int i, int cardinality, int Ncpt, double* cpt)
 			for (int k=0; k < cardinality; k++)
 				total += cpt[j + k*multiplier];
 			if (total > 0)
+			{
 				for (int k=0; k < cardinality; k++)
 					cpt[j + k*multiplier] /= total;
+			}
+			else
+			{
+				for (int k=0; k < cardinality; k++)
+					cpt[j + k*multiplier] = 1.0 / cardinality;
+			}
 		}
 	}
 }
