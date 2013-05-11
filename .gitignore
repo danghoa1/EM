@@ -19,3 +19,4 @@
 .sconsign.dblite
 bin/
 output/
+temp/

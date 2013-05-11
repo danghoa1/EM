@@ -27,6 +27,7 @@ InferenceEngine::InferenceEngine(int Nnodes, int* cardinality, int* Nparents, in
 InferenceEngine::~InferenceEngine()
 {
 	delete jEngine;
+	if (jvm != NULL) delete jvm;
 }
 
 // MAIN MEMBER FUNCTIONS *****************
