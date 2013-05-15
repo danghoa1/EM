@@ -12,6 +12,7 @@ public:
 	~InferenceEngine();
 	void updateCPTs(double** newcpts);
 	void updateEvidence(int* evidence);
+	double* tableConditional(int x);
 	double probability(int x, int u);
 private:
 

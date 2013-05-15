@@ -4,6 +4,7 @@
 #include "bayesian_network.h"
 #include "random_generator.h"
 #include "inference_engine.h"
+#include "stopwatch.h"
 #include <iostream>
 #include <string>
 #include <cstdlib>
@@ -109,7 +110,7 @@ void BayesNetwork::readNetwork(char* networkFilePath)
 			for (int j=0; j < m_Nparents[i]; j++)
 				netFile >> m_parents[i][j];
 		}
-		
+		else m_parents[i] = NULL;	
 		int dummy;
 		netFile >> dummy;
 	}
@@ -171,6 +172,13 @@ void BayesNetwork::learnML()
 void BayesNetwork::learnEM()
 {
 
+	Stopwatch memorySW;
+	Stopwatch inferenceSW;
+	Stopwatch normalizeSW;
+
+
+	memorySW.on();
+
 	const int MAX_NUMBER_OF_ITERATION = 100;
 
 	double*** theta = new double**[MAX_NUMBER_OF_ITERATION];
@@ -189,9 +197,13 @@ void BayesNetwork::learnEM()
 	}
 	theta[0] = zero;
 
+	memorySW.off();
 	
 	// Initialize Inference Engine
+	inferenceSW.on();
 	InferenceEngine engine(m_Nnodes,m_cardinality,m_Nparents,m_parents,m_Ncpt,theta[0],m_filePath);
+	inferenceSW.off();
+	
 
 	//Iterate
 	int k = 0;
@@ -199,10 +211,13 @@ void BayesNetwork::learnEM()
 	{
 		k++;
 		// Update CPTs
+		inferenceSW.on();
 		engine.updateCPTs(theta[k-1]);
 
-		
+		inferenceSW.off();
+
 		// Initialize New Array
+		memorySW.on();
 		double** cpts = new double*[m_Nnodes];
 		for (int i=0; i<m_Nnodes;i++)
 		{
@@ -213,8 +228,11 @@ void BayesNetwork::learnEM()
 
 			cpts[i] = cpt;
 		}
+		memorySW.off();
 
 		// Iterate over datasets
+		inferenceSW.on();
+
 		for (int i=0; i < m_Ncases;i++)
 		{
 			// Update evidence
@@ -228,22 +246,27 @@ void BayesNetwork::learnEM()
 				}
 			}
 		}
+		inferenceSW.off();
 
 		// Update theta
+		normalizeSW.on();
 		for (int i=0; i < m_Nnodes; i++)
 		{
 			normalizeCPT(i,m_cardinality[i],m_Ncpt[i], cpts[i]);		
 		}
+		normalizeSW.off();
 
 		theta[k] = cpts;
 	}
-	
+
 	// Copy cpts
+	normalizeSW.on();
 	for (int i=0; i < m_Nnodes; i++)
 		for (int j=0; j < m_Ncpt[i]; j++)
 			m_cpt[i][j] = theta[k][i][j];
+	normalizeSW.off();
 
-
+	memorySW.on();
 	// Dealloc
 	for (int i=0; i <= k; i++)
 	{
@@ -254,6 +277,13 @@ void BayesNetwork::learnEM()
 		delete [] theta[i];
 	}
 	delete [] theta;
+	
+	memorySW.off();
+	
+	inferenceSW.print("Inference:");
+	memorySW.print("Memory:");
+	normalizeSW.print("Normalize:");
+
 }
 
 void BayesNetwork::readDataset(char* datasetFilePath)

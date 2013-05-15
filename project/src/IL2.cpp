@@ -121,6 +121,7 @@ voidupdateCPTTablejintintjdoubleArray_doubledoubleID=NULL;
 voidstartEngineID=NULL;
 voidupdateEvidencejintArray_intintID=NULL;
 jdoubleprobabilityjintintjintintID=NULL;
+jdoubleArray_tableConditionaljintintID=NULL;
 voidprintID=NULL;
 
 
@@ -155,6 +156,7 @@ voidupdateCPTTablejintintjdoubleArray_doubledoubleID=NULL;
 voidstartEngineID=NULL;
 voidupdateEvidencejintArray_intintID=NULL;
 jdoubleprobabilityjintintjintintID=NULL;
+jdoubleArray_tableConditionaljintintID=NULL;
 voidprintID=NULL;
 
 
@@ -284,6 +286,43 @@ exit(EXIT_FAILURE);
                         jdouble res =  static_cast<jdouble>( curEnv->CallDoubleMethod( this->instance, jdoubleprobabilityjintintjintintID ,node, cptPos));
                         
 return res;
+
+}
+
+double* IL2::tableConditional (int node, int *lenRow){
+
+JNIEnv * curEnv = getCurrentEnv();
+
+if (jdoubleArray_tableConditionaljintintID==NULL) { /* Use the cache */
+ jdoubleArray_tableConditionaljintintID = curEnv->GetMethodID(this->instanceClass, "tableConditional", "(I)[D" ) ;
+if (jdoubleArray_tableConditionaljintintID == NULL) {
+std::cerr << "Could not access to the method " << "tableConditional" << std::endl;
+curEnv->ExceptionDescribe();
+
+exit(EXIT_FAILURE);
+}
+}
+                        jdoubleArray res =  static_cast<jdoubleArray>( curEnv->CallObjectMethod( this->instance, jdoubleArray_tableConditionaljintintID ,node));
+                        if (res == NULL) { return NULL; }
+                        if (curEnv->ExceptionCheck()) {
+curEnv->ExceptionDescribe() ;
+}
+
+* lenRow = curEnv->GetArrayLength(res);
+jboolean isCopy = JNI_FALSE;
+
+/* GetPrimitiveArrayCritical is faster than getXXXArrayElements */
+jdouble *resultsArray = static_cast<jdouble *>(curEnv->GetPrimitiveArrayCritical(res, &isCopy));
+double* myArray= new double[* lenRow];
+
+for (jsize i = 0; i < * lenRow; i++){
+myArray[i]=resultsArray[i];
+}
+curEnv->ReleasePrimitiveArrayCritical(res, resultsArray, JNI_ABORT);
+
+                        curEnv->DeleteLocalRef(res);
+
+return myArray;
 
 }
 

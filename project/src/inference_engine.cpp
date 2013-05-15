@@ -26,8 +26,9 @@ InferenceEngine::InferenceEngine(int Nnodes, int* cardinality, int* Nparents, in
 
 InferenceEngine::~InferenceEngine()
 {
-	delete jEngine;
-	if (jvm != NULL) delete jvm;
+	if (jEngine != NULL) delete jEngine;
+	// if (jvm != NULL) delete jvm;
+	jvm->DestroyJavaVM();
 }
 
 // MAIN MEMBER FUNCTIONS *****************
@@ -44,6 +45,12 @@ void InferenceEngine::updateCPTs(double** newcpts)
 void InferenceEngine::updateEvidence(int* evidence)
 {
 	jEngine->updateEvidence(evidence,m_Nnodes);	
+}
+
+double* InferenceEngine::tableConditional(int x)
+{
+	return NULL;
+	//return jEngine->tableConditional(x);
 }
 
 double InferenceEngine::probability(int x, int u)

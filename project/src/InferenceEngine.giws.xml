@@ -20,6 +20,10 @@
 	    		<param type="int" name="node" />
 			<param type="int" name="cptPos" />
 		</method>
+		
+		<method name="tableConditional" returnType="double[]">
+			<param type="int" name="node" />
+		</method>
 
 		<method name="print" returnType="void">
 		</method>

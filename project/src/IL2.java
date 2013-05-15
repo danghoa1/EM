@@ -33,8 +33,8 @@ import java.util.*;
 public class IL2{
 
     	BayesianNetwork bn;  // il2 library
-
 	JointEngine ie2;
+	double[][] tc;
 
 	// CONSTRUCTOR
 
@@ -83,12 +83,23 @@ public class IL2{
 		// Set evidence
 		
 		ie2.setEvidence(ie2Evidence);
+
+		// Update table conditional
+		int size = bn.domain().size();
+		tc = new double[size][];
+		for (int i=0; i < size; i++)
+			tc[i] = ie2.tableConditional(i).values();
+	}
+
+	public double[] tableConditional(int node)
+	{
+		return ie2.tableConditional(node).values();
 	}
 
 	public double probability(int node, int cptPos)    //cptPos is in IL2 format
 	{
-		//return 1;
 		return ie2.tableConditional(node).values()[cptPos];
+		//return tc[node][cptPos];
 	}
 
 	public void print()

@@ -6,20 +6,32 @@ using namespace std;
 
 Stopwatch::Stopwatch()
 {
+	duration = 0;
+	running = false;
 }
 
-void Stopwatch::Start()
+void Stopwatch::on()
 {
-	start = clock();
+	if (running == false)
+	{
+		running = true;
+		start = clock();
+	}
 }
 
-void Stopwatch::End()
+void Stopwatch::off()
 {
-	end = clock();
+	if (running)
+	{
+		running = false;
+		end = clock();
+		duration += end - start;
+	}
 }
 
-void Stopwatch::Print(string message)
+void Stopwatch::print(string message)
 {
-	cout<<message<<" "<<((double)(end-start))*1000/CLOCKS_PER_SEC<<" ms"<<endl;
+	off();
+	cout<<message<<" "<<((double)duration)*1000/CLOCKS_PER_SEC<<" ms"<<endl;
 }
 

@@ -10,13 +10,15 @@ class Stopwatch
 {
 public:
 	Stopwatch();		// Constructor
-	void Start();		// Start stopwatch
-	void End();		// End stopwatch
-	void Print(string message);	// Print elapse time with message
+	void on();
+	void off();
+	void print(string message);	// Print elapse time with message
 
 private:
+	bool running;
 	clock_t start;
 	clock_t end;	
+	clock_t duration;
 };
 
 #endif

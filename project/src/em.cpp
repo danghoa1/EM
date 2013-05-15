@@ -53,22 +53,22 @@ int main(int argc, char **argv)
 		type = BayesNetwork::IL1;
 	
 	// Read network
-	sw.Start();
+	sw.on();
 	BayesNetwork net(type);
 	net.readNetwork(ifile);
-	sw.End();
-	sw.Print("Read network:");
+	sw.off();
+	sw.print("Read network:");
 
 	// Read dataset
-	sw.Start();
+	sw.on();
 	net.readDataset(dfile);
-	sw.End();
-	sw.Print("Read dataset:");
+	sw.off();
+	sw.print("Read dataset:");
 
 	// Expectation Maximization
-	sw.Start();
+	sw.on();
 	net.learnEM();
-	sw.End();
-	sw.Print("Expectation Maximization:");
+	sw.off();
+	sw.print("Expectation Maximization:");
 	net.print();
 }

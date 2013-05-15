@@ -79,6 +79,7 @@ jmethodID voidupdateCPTTablejintintjdoubleArray_doubledoubleID; // cache method 
 jmethodID voidstartEngineID; // cache method id
 jmethodID voidupdateEvidencejintArray_intintID; // cache method id
 jmethodID jdoubleprobabilityjintintjintintID; // cache method id
+jmethodID jdoubleArray_tableConditionaljintintID; // cache method id
 jmethodID voidprintID; // cache method id
 
 
@@ -148,6 +149,8 @@ void startEngine();
 void updateEvidence(int const* dataset, int datasetSize);
 
 double probability(int node, int cptPos);
+
+double* tableConditional(int node, int *lenRow);
 
 void print();
 

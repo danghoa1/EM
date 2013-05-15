@@ -45,11 +45,11 @@ int main(int argc, char **argv)
 		type = BayesNetwork::IL1;
 	
 	// Read network
-	sw.Start();
+	sw.on();
 	BayesNetwork net(type);
 	net.readNetwork(ifile);
-	sw.End();
-	sw.Print("Read network:");
+	sw.off();
+	sw.print("Read network:");
 
 	// Print
 	net.print();

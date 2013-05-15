@@ -44,22 +44,22 @@ int main(int argc, char **argv)
 		dfile = dvalue;
 	
 	// Read network
-	sw.Start();
+	sw.on();
 	BayesNetwork net;
 	net.readNetwork(ifile);
-	sw.End();
-	sw.Print("Read network:");
+	sw.off();
+	sw.print("Read network:");
 
 	// Read dataset
-	sw.Start();
+	sw.on();
 	net.readDataset(dfile);
-	sw.End();
-	sw.Print("Read dataset:");
+	sw.off();
+	sw.print("Read dataset:");
 
 	// Maximum Likelihood
-	sw.Start();
+	sw.on();
 	net.learnML();
-	sw.End();
-	sw.Print("Maximum Likelihood:");
+	sw.off();
+	sw.print("Maximum Likelihood:");
 	net.print();
 }

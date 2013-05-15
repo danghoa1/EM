@@ -74,15 +74,15 @@ int main(int argc, char **argv)
 		hideProbability = hvalue;
 
 	// Read network
-	sw.Start();
+	sw.on();
 	BayesNetwork net(BayesNetwork::IL1);
 	net.readNetwork(ifile);
-	sw.End();
-	sw.Print("Read network:");
+	sw.off();
+	sw.print("Read network:");
 
 	// Simulate
-	sw.Start();
+	sw.on();
 	net.simulate(ofile,ncases,hideProbability,seed);
-	sw.End();
-	sw.Print("Simulate dataset:");	
+	sw.off();
+	sw.print("Simulate dataset:");	
 }

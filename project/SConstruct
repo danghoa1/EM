@@ -22,7 +22,7 @@ lib = ['jvm']
 env = Environment(CC='g++',CCFLAGS='-Wall -finline-functions -Wno-write-strings ',
                   CPPPATH=includes,
                   LIBS=lib,LIBPATH=libpath)
-env.Append(CCFLAGS='-O2')
+env.Append(CCFLAGS='-pg')
 
 # if mode == 'debug':
 #     build_dir = 'debug'
