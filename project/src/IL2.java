@@ -83,6 +83,9 @@ public class IL2{
 		// Set evidence
 		
 		ie2.setEvidence(ie2Evidence);
+		
+		double pr = ie2.prEvidence();
+
 
 		// Update table conditional
 		int size = bn.domain().size();

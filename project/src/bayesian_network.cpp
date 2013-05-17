@@ -242,7 +242,7 @@ void BayesNetwork::learnEM()
 			{
 				for (int u=0; u < m_Ncpt[x]; u++)
 				{
-					cpts[x][u] += engine.probability(x,u);
+					cpts[x][u]  += engine.probability(x,u);
 				}
 			}
 		}
