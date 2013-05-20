@@ -1,5 +1,5 @@
 # JAVA
-Java('', 'src',
+Java('', 'src/java',
      JAVAVERSION='1.6',
      JAVACLASSPATH=["libs","libs/inflib.jar"])
 

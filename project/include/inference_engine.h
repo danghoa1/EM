@@ -8,10 +8,10 @@ using namespace inflib;
 class InferenceEngine
 {
 public:
-	InferenceEngine(int Nnodes, int* cardinality, int* Nparents, int** parents, int* Ncpt, double** cpt, char* filepath);
+	InferenceEngine(char* filepath);
 	~InferenceEngine();
-	void updateCPTs(double** newcpts);
-	void updateEvidence(int* evidence);
+	void updateCPTs(int Nnodes, double** newcpts,int* Ncpt);
+	void updateEvidence(int* evidence, int Nnodes);
 	double* tableConditional(int x);
 	double probability(int x, int u);
 private:
@@ -21,12 +21,6 @@ private:
 
 // Network Info
 
-	int m_Nnodes;           // Number of nodes
-	int* m_cardinality;     // Cardinality for each node
-	int* m_Nparents;        // Number of parents for each node
-	int** m_parents;        // Array of parents for each node
-	int* m_Ncpt;            // CPT Length for each node
-	double** m_cpt;         // CPT table for each node
 	char* m_filepath;
 
 // private functions
