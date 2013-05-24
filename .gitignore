@@ -21,3 +21,6 @@ bin/
 output/
 temp/
 gmon.out
+build/
+debug/
+profile/

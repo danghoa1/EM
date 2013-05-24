@@ -25,17 +25,18 @@ env = Environment(CC='g++',CCFLAGS=['-Wall','-finline-functions','-Wno-write-str
 # support profiling (gprof)
 
 # env.Append(CCFLAGS=['-g','-pg'], LINKFLAGS=['-pg'])
-env.Append(CCFLAGS=['-O2']) 
-# if mode == 'debug':
-#     build_dir = 'debug'
-#     env.Append(CCFLAGS='-g')
-# elif mode == 'profile':
-#     build_dir = 'debug'
-#     env.Append(CCFLAGS='-pg')
-# else:
-#     build_dir = 'build'
-#     env.Append(CCFLAGS='-O2')
+#env.Append(CCFLAGS=['-O2']) 
 
-# SConscript('src/SConscript',variant_dir=build_dir,exports='env')
+if mode == 'debug':
+    build_dir = 'debug'
+    env.Append(CCFLAGS='-g')
+elif mode == 'profile':
+    build_dir = 'debug'
+    env.Append(CCFLAGS='-pg')
+    env.Append(LINKFLAGS='-pg')
+else:
+    build_dir = 'build'
+    env.Append(CCFLAGS='-O2')
+SConscript('src/SConscript',variant_dir=build_dir,exports='env')
 
-SConscript('src/SConscript',variant_dir='#/bin',exports='env')
+#SConscript('src/SConscript',variant_dir='#/bin',exports='env')
