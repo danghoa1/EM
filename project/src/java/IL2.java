@@ -34,6 +34,7 @@ public class IL2{
 
     	BayesianNetwork bn;  // il2 library
 	JointEngine ie2;
+	IntMap ie2Evidence;
 	double[][] tc;
 
 	// CONSTRUCTOR
@@ -67,18 +68,22 @@ public class IL2{
         	ie2 = startInferenceEngine2(bn);
 	}
 
+	public void loadEvidence(int[][] dataset)
+	{
+	}
+
 	public void updateEvidence(int[] dataset)
 	{
 		// Load evidenee 
 
-		IntMap ie2Evidence = new IntMap();
-		for (int i=0; i < dataset.length; i++)
-		{
-			if (dataset[i]!=-1)
+			ie2Evidence = new IntMap();
+			for (int i=0; i < dataset.length; i++)
 			{
+				if (dataset[i]!=-1)
+				{
 				ie2Evidence.putAtEnd(i,dataset[i]);
+				}
 			}
-		}
 
 		// Set evidence
 		
@@ -101,8 +106,8 @@ public class IL2{
 
 	public double probability(int node, int cptPos)    //cptPos is in IL2 format
 	{
-		return ie2.tableConditional(node).values()[cptPos];
-		//return tc[node][cptPos];
+		//return ie2.tableConditional(node).values()[cptPos];
+		return tc[node][cptPos];
 	}
 
 	public void print()
@@ -166,9 +171,9 @@ public class IL2{
         EliminationOrders.JT jt = getJoinTree(bn);
         JointEngine ie;
         //ie = il2.inf.jointree.NormalizedZCAlgorithm.create(cpts,jt);
-        //ie = il2.inf.jointree.UnindexedZCAlgorithm.create(cpts,jt);
+        ie = il2.inf.jointree.UnindexedZCAlgorithm.create(cpts,jt);
         //ie = il2.inf.jointree.UnindexedSSAlgorithm.create(cpts,jt);
-        ie = il2.inf.jointree.UnindexedHuginAlgorithm.create(cpts,jt);
+        //ie = il2.inf.jointree.UnindexedHuginAlgorithm.create(cpts,jt);
 
         double max = ie.getClusterStats().getNormalizedMax();
 		double total = ie.getClusterStats().getTotal().doubleValue();

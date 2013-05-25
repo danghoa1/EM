@@ -181,10 +181,9 @@ void BayesNetwork::learnEM()
 
 	const int MAX_NUMBER_OF_ITERATION = 100;
 
-	double*** theta = new double**[MAX_NUMBER_OF_ITERATION];
+	double** theta = new double*[m_Nnodes];
 	
-	//Initialize theta(0)  TODO
-	double** zero = new double*[m_Nnodes];
+	// Initialize theta
 	for (int i=0; i<m_Nnodes;i++)
 	{
 		double* cpt = new double[m_Ncpt[i]];
@@ -193,10 +192,8 @@ void BayesNetwork::learnEM()
 		for (int j=0; j<m_Ncpt[i]; j++)
 			cpt[j] = initValue;
 
-		zero[i] = cpt;
+		theta[i] = cpt;
 	}
-	theta[0] = zero;
-
 	memorySW.off();
 	
 	// Initialize Inference Engine
@@ -204,6 +201,13 @@ void BayesNetwork::learnEM()
 	InferenceEngine engine(m_filePath);
 	inferenceSW.off();
 	
+	double ** cpts = new double*[m_Nnodes];
+	for (int i=0; i < m_Nnodes; i++)
+	{
+		double* cpt = new double[m_Ncpt[i]];
+		cpts[i] = cpt;
+	}
+
 
 	//Iterate
 	int k = 0;
@@ -212,23 +216,17 @@ void BayesNetwork::learnEM()
 		k++;
 		// Update CPTs
 		inferenceSW.on();
-		engine.updateCPTs(m_Nnodes,theta[k-1],m_Ncpt);
+		engine.updateCPTs(m_Nnodes,theta,m_Ncpt);
 
 		inferenceSW.off();
 
-		// Initialize New Array
-		memorySW.on();
-		double** cpts = new double*[m_Nnodes];
 		for (int i=0; i<m_Nnodes;i++)
 		{
-			double* cpt = new double[m_Ncpt[i]];
 			
 			for (int j=0; j< m_Ncpt[i]; j++)
-				cpt[j]  =0;
+				cpts[i][j]  =0;
 
-			cpts[i] = cpt;
 		}
-		memorySW.off();
 
 		// Iterate over datasets
 		inferenceSW.on();
@@ -256,27 +254,26 @@ void BayesNetwork::learnEM()
 		}
 		normalizeSW.off();
 
-		theta[k] = cpts;
+		// Swap matrices (update theta as cpt but reuse old theta matrix)
+		double ** temp = theta;
+		theta = cpts;
+		cpts = temp;
 	}
 
 	// Copy cpts
 	normalizeSW.on();
 	for (int i=0; i < m_Nnodes; i++)
 		for (int j=0; j < m_Ncpt[i]; j++)
-			m_cpt[i][j] = theta[k][i][j];
+			m_cpt[i][j] = theta[i][j];
 	normalizeSW.off();
 
 	memorySW.on();
 	// Dealloc
-	for (int i=0; i <= k; i++)
-	{
 		for (int j=0; j < m_Nnodes; j++)
 		{
-			delete [] theta[i][j];
+			delete [] theta[j];
 		}
-		delete [] theta[i];
-	}
-	delete [] theta;
+		delete [] theta;
 	
 	memorySW.off();
 	

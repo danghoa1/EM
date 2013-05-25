@@ -23,8 +23,9 @@ env = Environment(CC='g++',CCFLAGS=['-Wall','-finline-functions','-Wno-write-str
                   CPPPATH=includes,
                   LIBS=lib,LIBPATH=libpath)
 # support profiling (gprof)
-env.Append(CCFLAGS=['-g','-pg'], LINKFLAGS=['-pg'])
 
+# env.Append(CCFLAGS=['-g','-pg'], LINKFLAGS=['-pg'])
+env.Append(CCFLAGS=['-O2']) 
 # if mode == 'debug':
 #     build_dir = 'debug'
 #     env.Append(CCFLAGS='-g')
