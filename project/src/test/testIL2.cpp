@@ -3,17 +3,40 @@
 
 using namespace std;
 
-int main()
+int main(int argc, char **argv)
 {
+	int loop = 3000;
+	char* filename = "network/nets-uai/easy/alarm.uai";
+	int c;
+	opterr = 1;
+
+	while ((c = getopt (argc, argv, "l:f:")) != -1)
+	{
+		switch (c)
+		{
+			case 'l':
+				loop = atoi(optarg);
+				break;
+			case 'f':
+				filename = optarg;
+				break;
+			default:
+				abort();
+		}
+	}
+
 	Stopwatch sw;
 	sw.on();
+
+	int dataset[37];
 	
-	InferenceEngine engine("network/nets-uai/easy/alarm.uai");
-	for (int i=1; i<= 3000; i++)
+	InferenceEngine engine(filename);
+	for (int i=1; i<= loop; i++)
 	{
-		int dataset[1];
-		dataset[1] = i % 2;
-		engine.updateEvidence(dataset,1);
+		for (int j=0; j < 37; j++)
+			dataset[j] = j % 2;
+		engine.updateEvidence(dataset,37);
+		double prob = engine.probability(0,0);
 
 	}
 

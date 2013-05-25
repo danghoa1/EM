@@ -1,0 +1,8 @@
+#!/bin/bash
+#
+
+lib_dir=lib
+cp=${lib_dir}:${lib_dir}/inflib.jar:${lib_dir}/commons-math-2.2.jar
+memops=-Xmx512m
+
+java ${memops} -cp ${cp} edml.Main $*

@@ -1,0 +1,4 @@
+Java('lib', 'src', 
+     JAVAVERSION='1.6',
+     JAVACLASSPATH=["lib","lib/inflib.jar","lib/commons-math-2.2.jar"],
+     JAVACFLAGS=['-g'])

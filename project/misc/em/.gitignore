@@ -1,0 +1,17 @@
+lib
+nets
+output
+py
+*.class
+*.jar
+*.output
+*.pyc
+java.hprof*.txt
+src/old
+bak/
+runexp.py
+TAGS
+nets-uai
+.sconsign.dblite
+data-uai/
+khaled/
