@@ -179,7 +179,7 @@ void BayesNetwork::learnEM()
 
 	memorySW.on();
 
-	const int MAX_NUMBER_OF_ITERATION = 100;
+	const int MAX_NUMBER_OF_ITERATION = 20;
 
 	double** theta = new double*[m_Nnodes];
 	
@@ -196,11 +196,8 @@ void BayesNetwork::learnEM()
 	}
 	memorySW.off();
 	
-	// Initialize Inference Engine
-	inferenceSW.on();
-	InferenceEngine engine(m_filePath);
-	inferenceSW.off();
-	
+	// Initialize cpt
+
 	double ** cpts = new double*[m_Nnodes];
 	for (int i=0; i < m_Nnodes; i++)
 	{
@@ -208,6 +205,12 @@ void BayesNetwork::learnEM()
 		cpts[i] = cpt;
 	}
 
+	// Initialize Inference Engine
+	inferenceSW.on();
+	InferenceEngine engine(m_filePath);
+	engine.loadEvidence(m_dataset,m_Ncases,m_Nnodes);
+	inferenceSW.off();
+	
 
 	//Iterate
 	int k = 0;
@@ -217,7 +220,6 @@ void BayesNetwork::learnEM()
 		// Update CPTs
 		inferenceSW.on();
 		engine.updateCPTs(m_Nnodes,theta,m_Ncpt);
-
 		inferenceSW.off();
 
 		for (int i=0; i<m_Nnodes;i++)
@@ -233,14 +235,14 @@ void BayesNetwork::learnEM()
 
 		for (int i=0; i < m_Ncases;i++)
 		{
-			// Update evidence
-			engine.updateEvidence(m_dataset[i],m_Nnodes);
+			engine.updateEvidence(i);
 
 			for (int x=0; x < m_Nnodes; x++)
 			{
+				double* tc = engine.tableConditional(x);
 				for (int u=0; u < m_Ncpt[x]; u++)
 				{
-					cpts[x][u]  += engine.probability(x,u);
+					cpts[x][u]  += tc[u];
 				}
 			}
 		}

@@ -11,7 +11,8 @@ public:
 	InferenceEngine(char* filepath);
 	~InferenceEngine();
 	void updateCPTs(int Nnodes, double** newcpts,int* Ncpt);
-	void updateEvidence(int* evidence, int Nnodes);
+	void loadEvidence(int** dataset,int datasetLength,  int Nnodes);
+	void updateEvidence(int index);
 	double* tableConditional(int x);
 	double probability(int x, int u);
 private:

@@ -11,9 +11,13 @@
 
           	<method name="startEngine" returnType="void">
 		</method>
+		
+		<method name="loadEvidence" returnType="void">
+			<param type="int[][]" name="dataset"/>
+		</method>
 
           	<method name="updateEvidence" returnType="void">
-	    		<param type="int[]" name="dataset" />
+	    		<param type="int" name="index" />
 		</method>
 
           	<method name="probability" returnType="double">

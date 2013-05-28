@@ -34,15 +34,20 @@ void InferenceEngine::updateCPTs(int Nnodes, double** newcpts, int* Ncpt)
 
 }
 
-void InferenceEngine::updateEvidence(int* evidence, int Nnodes)
+void InferenceEngine::loadEvidence(int** dataset,int datasetLength,  int Nnodes)
 {
-	jEngine->updateEvidence(evidence,Nnodes);	
+	jEngine->loadEvidence(dataset,datasetLength,Nnodes);	
+}
+
+void InferenceEngine::updateEvidence(int index)
+{
+	jEngine->updateEvidence(index);
 }
 
 double* InferenceEngine::tableConditional(int x)
 {
-	return NULL;
-	//return jEngine->tableConditional(x);
+	int len;
+	return jEngine->tableConditional(x,&len);
 }
 
 double InferenceEngine::probability(int x, int u)

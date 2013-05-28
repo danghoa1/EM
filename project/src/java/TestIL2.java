@@ -24,8 +24,8 @@ class TestIL2
 		{
 			for (int j=0; j < 37; j++)
 				dataset[j] = (j % 2);
-			engine.updateEvidence(dataset);
-			double prob = engine.probability(0,0);
+	//		engine.updateEvidence(dataset);
+	//		double prob = engine.probability(0,0);
 		}
 
 		long end = System.nanoTime();

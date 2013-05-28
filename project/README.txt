@@ -16,3 +16,7 @@ ml:
 -i <path/file> : path to bayesian network input file
 
 -d <path/file> : path to simulated dataset input file
+
+
+valgrind --tool=callgrind --dump-instr=yes --collect-jumps=yes debug/em -i network/alarm-seed.uai -d output/alarm.dat
+

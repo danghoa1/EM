@@ -34,7 +34,7 @@ public class IL2{
 
     	BayesianNetwork bn;  // il2 library
 	JointEngine ie2;
-	IntMap ie2Evidence;
+	IntMap ie2Evidence[];
 	double[][] tc;
 
 	// CONSTRUCTOR
@@ -68,26 +68,28 @@ public class IL2{
         	ie2 = startInferenceEngine2(bn);
 	}
 
+
 	public void loadEvidence(int[][] dataset)
 	{
-	}
-
-	public void updateEvidence(int[] dataset)
-	{
-		// Load evidenee 
-
-			ie2Evidence = new IntMap();
-			for (int i=0; i < dataset.length; i++)
+		ie2Evidence = new IntMap[dataset.length];
+		for (int i=0; i < dataset.length; i++)
+		{
+			ie2Evidence[i] = new IntMap();
+			for (int j=0; j < dataset[i].length;j++)
 			{
-				if (dataset[i]!=-1)
+				if (dataset[i][j] != -1)
 				{
-				ie2Evidence.putAtEnd(i,dataset[i]);
+					ie2Evidence[i].putAtEnd(j,dataset[i][j]);
 				}
 			}
+		}
+	}
 
+	public void updateEvidence(int index)
+	{
 		// Set evidence
 		
-		ie2.setEvidence(ie2Evidence);
+		ie2.setEvidence(ie2Evidence[index]);
 		
 		double pr = ie2.prEvidence();
 
@@ -101,12 +103,11 @@ public class IL2{
 
 	public double[] tableConditional(int node)
 	{
-		return ie2.tableConditional(node).values();
+		return tc[node];
 	}
 
 	public double probability(int node, int cptPos)    //cptPos is in IL2 format
 	{
-		//return ie2.tableConditional(node).values()[cptPos];
 		return tc[node][cptPos];
 	}
 
