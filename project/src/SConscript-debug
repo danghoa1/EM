@@ -1,0 +1,26 @@
+# list of source files
+
+classes = 'classes/'
+test = 'test/'
+main = 'main/'
+
+src = [classes + 'bayesian_network.cpp',classes + 'stopwatch.cpp',classes + 'random_generator.cpp',classes + 'IL2.cpp',classes + 'inference_engine.cpp']
+
+src2 = [classes + 'bayesian_network.cpp',classes + 'stopwatch.cpp',classes + 'random_generator.cpp',classes + 'IL2.cpp']
+# main
+
+simulate = [main + 'simulator.cpp']
+ml = [main + 'maximum_likelihood.cpp']
+em = [main + 'em.cpp']
+
+# test
+
+testRead = [test + 'testRead.cpp']
+testIL2 = [test + 'testIL2.cpp']
+
+Import('env')
+env.Program('simulator',simulate+src)
+env.Program('ml',ml+src)
+env.Program('testRead',testRead+src)
+env.Program('em',em+src)
+env.Program('testIL2',testIL2+src)

@@ -31,6 +31,7 @@ BayesNetwork::~BayesNetwork()
 	{
 		for(int i=0; i < m_Ncases; i++)
 			delete [] m_dataset[i];
+		delete [] m_dataset;
 	}
 
 	if (m_parents != NULL)
@@ -40,6 +41,8 @@ BayesNetwork::~BayesNetwork()
 			delete [] m_parents[i];
 			delete [] m_cpt[i];
 		}
+		delete [] m_parents;
+		delete [] m_cpt;
 	}
 
 	if (m_Nparents != NULL) delete [] m_Nparents;
@@ -169,7 +172,7 @@ void BayesNetwork::learnML()
 	}
 }
 
-void BayesNetwork::learnEM()
+void BayesNetwork::learnEM(int max_iteration)
 {
 
 	Stopwatch memorySW;
@@ -179,7 +182,7 @@ void BayesNetwork::learnEM()
 
 	memorySW.on();
 
-	const int MAX_NUMBER_OF_ITERATION = 20;
+	const int MAX_NUMBER_OF_ITERATION = max_iteration;
 
 	double** theta = new double*[m_Nnodes];
 	
@@ -240,10 +243,20 @@ void BayesNetwork::learnEM()
 			for (int x=0; x < m_Nnodes; x++)
 			{
 				double* tc = engine.tableConditional(x);
-				for (int u=0; u < m_Ncpt[x]; u++)
+				int n = m_Ncpt[x];
+                /*
+				for (int u=0; u < n; u++)
 				{
 					cpts[x][u]  += tc[u];
+				//	cpts[x][u] +=engine.probability(x,u);
 				}
+                */
+                double* end = cpts[x] + n;
+                double* cur = cpts[x];
+                double* cur_tc = tc;
+                while (cur < end)
+                  *(cur++) += *(cur_tc++);
+				delete [] tc;
 			}
 		}
 		inferenceSW.off();
@@ -271,11 +284,13 @@ void BayesNetwork::learnEM()
 
 	memorySW.on();
 	// Dealloc
-		for (int j=0; j < m_Nnodes; j++)
-		{
-			delete [] theta[j];
-		}
-		delete [] theta;
+	for (int j=0; j < m_Nnodes; j++)
+	{
+		delete [] theta[j];
+		delete [] cpts[j];
+	}
+	delete [] theta;
+	delete [] cpts;
 	
 	memorySW.off();
 	
@@ -362,6 +377,7 @@ void BayesNetwork::readDataset(char* datasetFilePath)
 			m_dataset[readCount] = a;
 			readCount++;
 		}
+		else delete [] a;
 	}
 	dsFile.close();
 }

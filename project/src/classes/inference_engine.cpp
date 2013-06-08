@@ -62,13 +62,14 @@ JavaVM*  InferenceEngine::create_vm() {
 	JNIEnv* env;
 
     	JavaVMInitArgs args;
-        JavaVMOption options[1];
+        JavaVMOption options[2];
 
 	/* There is a new JNI_VERSION_1_4, but it doesn't add anything for the purposes of our example. */
 	args.version = JNI_VERSION_1_4;
 
-	args.nOptions = 1;
+	args.nOptions = 2;
 	options[0].optionString = "-Djava.class.path=.:libs/inflib.jar";
+	options[1].optionString = "-Xcheck:jni";
 	args.options = options;
 	args.ignoreUnrecognized = JNI_FALSE;
 	JNI_CreateJavaVM(&jvm, (void **)&env, &args);

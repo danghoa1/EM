@@ -30,13 +30,14 @@ env = Environment(CC='g++',CCFLAGS=['-Wall','-finline-functions','-Wno-write-str
 if mode == 'debug':
     build_dir = 'debug'
     env.Append(CCFLAGS='-g')
+    SConscript('src/SConscript-debug',variant_dir=build_dir,exports='env')
 elif mode == 'profile':
     build_dir = 'debug'
     env.Append(CCFLAGS='-pg')
     env.Append(LINKFLAGS='-pg')
 else:
     build_dir = 'build'
-    env.Append(CCFLAGS='-O2')
-SConscript('src/SConscript',variant_dir=build_dir,exports='env')
+    env.Append(CCFLAGS=['-O2'])
+    SConscript('src/SConscript',variant_dir=build_dir,exports='env')
 
 #SConscript('src/SConscript',variant_dir='#/bin',exports='env')

@@ -15,7 +15,7 @@ public:
 	void readNetwork(char* networkFilePath);	//Create network from file
 	void readDataset(char* datasetFilePath);	//Store dataset from file
 	void learnML();					//Learn from complete data
-	void learnEM();					//Learn from incomplete data
+	void learnEM(int max_iteration = 20);		//Learn from incomplete data
 	void simulate(const char* simulateDatasetFilePath, int Ncases, double hideProbability, int seed);	//Simulate dataset from network
 	void EM();
 	void print();

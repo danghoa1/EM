@@ -338,11 +338,13 @@ jboolean isCopy = JNI_FALSE;
 
 /* GetPrimitiveArrayCritical is faster than getXXXArrayElements */
 jdouble *resultsArray = static_cast<jdouble *>(curEnv->GetPrimitiveArrayCritical(res, &isCopy));
+
 double* myArray= new double[* lenRow];
 
 for (jsize i = 0; i < * lenRow; i++){
 myArray[i]=resultsArray[i];
 }
+
 curEnv->ReleasePrimitiveArrayCritical(res, resultsArray, JNI_ABORT);
 
                         curEnv->DeleteLocalRef(res);

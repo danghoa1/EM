@@ -91,15 +91,35 @@ public class IL2{
 		
 		ie2.setEvidence(ie2Evidence[index]);
 		
-		double pr = ie2.prEvidence();
+		ie2.prEvidence();
+		
+		// Update table conditional
+		int size = bn.domain().size();
+		tc = new double[size][];
+		for (int i=0; i < size; i++)
+		{
+			tc[i] = ie2.tableConditional(i).values();
+			
+			}
+			
+		
+	}
+
+	public double prEvidence()
+	{
+		return ie2.prEvidence();
+	}
 
 
+	public void fetchTableConditional()
+	{
 		// Update table conditional
 		int size = bn.domain().size();
 		tc = new double[size][];
 		for (int i=0; i < size; i++)
 			tc[i] = ie2.tableConditional(i).values();
 	}
+
 
 	public double[] tableConditional(int node)
 	{
@@ -108,6 +128,7 @@ public class IL2{
 
 	public double probability(int node, int cptPos)    //cptPos is in IL2 format
 	{
+		//return ie2.tableConditional(node).values()[cptPos];
 		return tc[node][cptPos];
 	}
 
@@ -172,9 +193,9 @@ public class IL2{
         EliminationOrders.JT jt = getJoinTree(bn);
         JointEngine ie;
         //ie = il2.inf.jointree.NormalizedZCAlgorithm.create(cpts,jt);
-        ie = il2.inf.jointree.UnindexedZCAlgorithm.create(cpts,jt);
+        //ie = il2.inf.jointree.UnindexedZCAlgorithm.create(cpts,jt);
         //ie = il2.inf.jointree.UnindexedSSAlgorithm.create(cpts,jt);
-        //ie = il2.inf.jointree.UnindexedHuginAlgorithm.create(cpts,jt);
+        ie = il2.inf.jointree.UnindexedHuginAlgorithm.create(cpts,jt);
 
         double max = ie.getClusterStats().getNormalizedMax();
 		double total = ie.getClusterStats().getTotal().doubleValue();

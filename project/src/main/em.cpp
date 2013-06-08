@@ -15,10 +15,12 @@ int main(int argc, char **argv)
 	char* dvalue = NULL;
 	int tflag =0;
 	int tvalue = 1;			// network type {1 : IL1, 2: IL2}
+	int lflag = 0;
+	int lvalue = 0;
 	int c;
 	opterr = 1;
 
-	while ((c = getopt (argc, argv, "i:d:t:")) != -1)
+	while ((c = getopt (argc, argv, "i:d:t:l:")) != -1)
 	{
 		switch (c)
 		{
@@ -34,6 +36,10 @@ int main(int argc, char **argv)
 				tflag = 1;
 				tvalue = atoi(optarg);
 				break;
+			case 'l':
+				lflag = 1;
+				lvalue = atoi(optarg);
+				break;
 			default:
 				abort();
 		}
@@ -45,13 +51,20 @@ int main(int argc, char **argv)
 	char* ifile = "network/network1.uai";
 	if (iflag == 1)
 		ifile = ivalue;
+	
 	char* dfile = "output/simulate1.dat";	
 	if (dflag == 1)
 		dfile = dvalue;
+	
 	BayesNetwork::NetworkType type = BayesNetwork::IL2;
 	if (tflag == 1	&& tvalue == 1)
 		type = BayesNetwork::IL1;
 	
+	int max_iteration = 20;
+	if (lflag == 1)
+		max_iteration = lvalue;
+
+
 	// Read network
 	sw.on();
 	BayesNetwork net(type);
@@ -67,7 +80,7 @@ int main(int argc, char **argv)
 
 	// Expectation Maximization
 	sw.on();
-	net.learnEM();
+	net.learnEM(max_iteration);
 	sw.off();
 	sw.print("Expectation Maximization:");
 	net.print();
